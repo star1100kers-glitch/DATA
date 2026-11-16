@@ -1,0 +1,11 @@
+{
+  "name": "pf-business-plan",
+  "version": "0.1.0",
+  "private": true,
+  "description": "대주단 제출용 사업계획서 계산 앱",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/calc.test.js test/report.test.js test/region.test.js test/trades.test.js test/charts.test.js test/supply.test.js",
+    "build": "node build.js"
+  }
+}

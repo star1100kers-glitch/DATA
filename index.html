@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사업계획서</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #fff; --text: #1d2330; --muted: #6b7280;
+    --line: #e2e5ea; --accent: #1f4e8c; --accent-soft: #e8eef7; --danger: #c0261b;
+    --ok-bg: #e3f4e8; --ok-fg: #17663a; --ng-bg: #fbe4e2; --ng-fg: #a3231a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.55;
+  }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+
+  /* 버튼 */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center; }
+  .toolbar span { color: var(--muted); font-size: 13px; margin-right: 4px; }
+  .toolbar .spacer { flex: 1; }
+  button {
+    font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); padding: 7px 14px;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.preset { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 600; }
+  button.preset:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { color: #fff; opacity: .9; }
+  button.ghost { border: none; background: none; color: var(--muted); padding: 4px 8px; }
+  button.ghost:hover { color: var(--danger); }
+
+  /* 입력 폼 */
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .panel h2 { font-size: 15px; margin: 0 0 14px; color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .grid.two { grid-template-columns: 1fr 1fr; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input {
+    width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 6px; background: #fff; color: var(--text);
+  }
+  input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  input.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .unit { position: relative; }
+  .unit input { padding-right: 44px; }
+  .unit em { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-style: normal; color: var(--muted); font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; }
+  .form-units th { font-size: 13px; color: var(--muted); font-weight: 500; text-align: left; padding: 0 6px 6px; }
+  .form-units th.r { text-align: right; }
+  .form-units td { padding: 4px 6px; }
+  td.sub-total { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 14px; }
+  .form-units tfoot td { border-top: 1px solid var(--line); padding-top: 10px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .form-units tfoot td.r { text-align: right; }
+  .table-actions { margin-top: 10px; }
+  .table-wrap { overflow-x: auto; }
+
+  /* 사업계획서 문서 */
+  .doc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 32px; margin-top: 28px; }
+  .doc-head { border-bottom: 2px solid var(--text); padding-bottom: 12px; margin-bottom: 8px; }
+  .doc-head h1 { font-size: 24px; }
+  .doc-head p { margin: 0; color: var(--muted); font-size: 14px; }
+  .chapter { padding: 22px 0 6px; border-bottom: 1px solid var(--line); }
+  .chapter:last-child { border-bottom: none; }
+  .chapter h2 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+  .chapter h2 .no {
+    display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--accent); color: #fff; font-size: 14px; flex: none;
+  }
+  .chapter h3 { font-size: 14px; margin: 18px 0 8px; color: var(--accent); }
+  .chapter h3 small, .grid-table small, .sens small { color: var(--muted); font-weight: 400; }
+  .basis { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+
+  .metrics { border-top: 1px solid var(--line); }
+  .metric {
+    display: grid; grid-template-columns: 150px 140px 1fr; gap: 4px 16px; align-items: baseline;
+    padding: 8px 4px; border-bottom: 1px solid var(--line);
+  }
+  .m-label { color: var(--text); }
+  .m-value { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .m-formula { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .metric.key .m-value { font-size: 18px; color: var(--accent); }
+  .metric.total { border-top: 2px solid var(--text); border-bottom: none; }
+  .metric.total .m-label, .metric.total .m-value { font-weight: 700; }
+
+  .neg { color: var(--danger) !important; }
+  .na { color: var(--muted); font-weight: 400; font-style: italic; }
+  .empty {
+    border: 1px dashed var(--line); border-radius: 8px; padding: 16px; color: var(--muted);
+    background: #fafbfc; display: flex; flex-direction: column; gap: 4px;
+  }
+  .empty b { color: var(--text); }
+  .empty span { font-size: 13px; }
+
+  .grid-table th { font-size: 13px; color: var(--muted); font-weight: 500; text-align: left; padding: 6px; border-bottom: 1px solid var(--line); }
+  .grid-table td { padding: 6px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .grid-table .r { text-align: right; }
+  .grid-table .b { font-weight: 700; }
+  .grid-table tfoot td { font-weight: 700; border-bottom: none; }
+
+  table.sens { border-collapse: separate; border-spacing: 3px; }
+  table.sens th { text-align: right; padding: 4px 8px; white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--muted); }
+  table.sens th.plan { color: var(--accent); font-weight: 700; }
+  table.sens th.row { text-align: left; }
+  table.sens td { text-align: right; padding: 8px; border-radius: 4px; font-variant-numeric: tabular-nums; font-size: 14px; }
+  table.sens td.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  table.sens td.ng { background: var(--ng-bg); color: var(--ng-fg); }
+  table.sens td.plan { outline: 2px solid var(--accent); font-weight: 700; }
+  .verdict { margin: 14px 0 0; font-weight: 700; font-size: 16px; }
+  .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 10px; vertical-align: middle; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .badge.ng { background: var(--ng-bg); color: var(--ng-fg); }
+  .risk { border-left: 4px solid var(--ok-fg); padding: 2px 0 2px 14px; margin: 14px 0; }
+  .risk.ng { border-left-color: var(--danger); }
+  .risk h3 { color: var(--text); margin: 0 0 6px; font-size: 15px; }
+  .risk p { margin: 0 0 6px; }
+  .risk ul, .unverified { margin: 0; padding-left: 20px; }
+  .risk li { color: var(--muted); }
+  .unverified li { margin: 4px 0; }
+  .m-label small { color: var(--muted); font-size: 12px; }
+  .metric.text .m-value { grid-column: 2 / -1; text-align: left; }
+
+  /* 2장 시장 분석 */
+  .progress { display: inline-block; font-size: 13px; color: var(--muted); background: #f1f3f6; border-radius: 12px; padding: 2px 12px; margin: 0 0 4px; font-variant-numeric: tabular-nums; }
+  .progress.busy::before { content: "⟳ "; }
+  .meta { display: grid; grid-template-columns: 72px 1fr; gap: 2px 12px; margin: 8px 0 4px; font-size: 12.5px; color: var(--muted); background: #fafbfc; border-radius: 6px; padding: 8px 12px; }
+  .meta div { display: contents; }
+  .meta dt { font-weight: 600; color: var(--text); }
+  .meta dd { margin: 0; }
+  button.retry { font-size: 12px; padding: 1px 8px; margin-left: 4px; }
+  .errmsg { font-size: 11.5px; color: var(--muted); max-width: 220px; margin-left: auto; white-space: normal; }
+  .grid-table small { font-size: 12px; }
+  .metric.text .m-formula { display: none; }
+  .cands { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .cands .cand { font-size: 13px; padding: 3px 10px; }
+  .cands .cand small { color: var(--muted); margin-left: 4px; }
+
+  /* 차트 (SVG) */
+  .chart-box { margin: 8px 0 0; padding: 0; }
+  svg.chart { display: block; width: 100%; height: auto; max-width: 720px; font-family: inherit; }
+  svg.chart .grid { stroke: var(--line); stroke-width: 1; }
+  svg.chart .axis, svg.chart .zero { stroke: var(--muted); stroke-width: 1; }
+  svg.chart .tick, svg.chart .unit, svg.chart .note { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  svg.chart .cat { fill: var(--text); font-size: 12.5px; font-weight: 600; }
+  svg.chart .val { fill: var(--text); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  svg.chart .val.neg { fill: var(--danger); }
+  svg.chart .bar-total { fill: var(--accent); }
+  svg.chart .bar-neg { fill: var(--danger); }
+  svg.chart .bar-down { fill: #e7a29b; }
+  svg.chart .bar-up { fill: #7cc39a; }
+  svg.chart .link { stroke: var(--muted); stroke-dasharray: 3 3; }
+  svg.chart .pt { fill: var(--text); fill-opacity: .75; stroke: #fff; stroke-width: 1.5; }
+  svg.chart .line-plan { stroke: var(--accent); stroke-width: 2; }
+  svg.chart .line-repay { stroke: var(--danger); stroke-width: 2; stroke-dasharray: 6 4; }
+  svg.chart .lbl-plan { fill: var(--accent); font-size: 12px; font-weight: 700; }
+  svg.chart .lbl-repay { fill: var(--danger); font-size: 12px; font-weight: 700; }
+  svg.chart .band-ok { fill: var(--ok-bg); }
+  svg.chart .band-ng { fill: var(--ng-bg); }
+  .chart-meta { grid-template-columns: 56px 1fr; }
+
+  /* 휴대폰: 세로 1열 */
+  @media (max-width: 640px) {
+    main { padding: 20px 16px 48px; }
+    .grid.two { grid-template-columns: 1fr; }
+    .form-units { min-width: 540px; }
+    .doc { padding: 18px 16px; }
+    .metric { grid-template-columns: 1fr auto; }
+    .m-formula { grid-column: 1 / -1; }
+    table.sens { min-width: 600px; }
+    .chart-box { overflow-x: auto; }
+    svg.chart { min-width: 520px; }
+  }
+
+  /* 인쇄: A4 문서 (입력 폼 숨김) */
+  @page { size: A4; margin: 16mm 14mm; }
+  @media print {
+    body { background: #fff; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    main { max-width: none; padding: 0; }
+    .no-print { display: none !important; }
+    .doc { border: none; padding: 0; margin: 0; border-radius: 0; }
+    .table-wrap { overflow: visible; }
+    table.sens { min-width: 0; }
+    table.sens td { padding: 5px 6px; font-size: 9.5pt; }
+    .metric { grid-template-columns: 34mm 30mm 1fr; padding: 5px 2px; }
+    .m-formula { grid-column: auto; font-size: 8.5pt; }
+    .chapter h2 { break-after: avoid; }
+    .chapter h3 { break-after: avoid; }
+    .metric, table, .risk, .empty, .verdict { break-inside: avoid; }
+    #ch5, #ch6 { break-before: page; }
+    .progress, .errmsg { display: none; }
+    .meta { break-inside: avoid; }
+    .chart-box { break-inside: avoid; }
+    svg.chart { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="no-print">
+    <h1>사업계획서 작성</h1>
+    <p class="sub">대주단 제출용 · 입력값 기반 계산</p>
+
+    <div class="toolbar">
+      <span>임시 값</span>
+      <button class="preset" data-preset="A">A 해운대 그린테라스</button>
+      <button class="preset" data-preset="B">B 영통 센트럴파크</button>
+      <button class="preset" data-preset="C">C 유성 리버뷰</button>
+      <button class="ghost" id="clear">초기화</button>
+      <span class="spacer"></span>
+      <button class="primary" id="print">인쇄 · PDF</button>
+    </div>
+
+    <form id="form" autocomplete="off" onsubmit="return false">
+      <section class="panel">
+        <h2>사업 개요</h2>
+        <div class="grid two">
+          <div><label for="name">사업명</label><input id="name" placeholder="예: 해운대 그린테라스"></div>
+          <div><label for="site">사업대상지</label><input id="site" placeholder="예: 부산광역시 해운대구"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>주택형</h2>
+        <div class="table-wrap">
+          <table class="form-units">
+            <thead>
+              <tr>
+                <th style="width:20%">이름</th>
+                <th class="r" style="width:18%">전용㎡</th>
+                <th class="r" style="width:18%">공급평</th>
+                <th class="r" style="width:16%">세대수</th>
+                <th class="r" style="width:20%">공급면적(평)</th>
+                <th style="width:8%"></th>
+              </tr>
+            </thead>
+            <tbody id="units"></tbody>
+            <tfoot>
+              <tr>
+                <td>합계</td><td></td><td></td>
+                <td class="r" id="sumHH">0</td>
+                <td class="r" id="sumArea">0.0</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="table-actions"><button type="button" id="addRow">+ 행 추가</button></div>
+      </section>
+
+      <section class="panel">
+        <h2>분양 · 수입</h2>
+        <div class="grid">
+          <div><label for="price">평당가</label><div class="unit"><input class="num" id="price" inputmode="decimal"><em>만원</em></div></div>
+          <div><label for="retail">상가</label><div class="unit"><input class="num" id="retail" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="other">기타유입</label><div class="unit"><input class="num" id="other" inputmode="decimal"><em>억원</em></div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>비용 · 금융</h2>
+        <div class="grid">
+          <div><label for="fixed">고정비</label><div class="unit"><input class="num" id="fixed" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="pf">본PF</label><div class="unit"><input class="num" id="pf" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="pfCost">본PF 금융비용</label><div class="unit"><input class="num" id="pfCost" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="sub">후순위</label><div class="unit"><input class="num" id="sub" inputmode="decimal"><em>억원</em></div></div>
+        </div>
+      </section>
+    </form>
+  </div>
+
+  <article class="doc">
+    <header class="doc-head">
+      <h1 id="docTitle">사업계획서</h1>
+      <p id="docSub"></p>
+    </header>
+    <div id="report"></div>
+  </article>
+</main>
+
+<script src="presets.js"></script>
+<script src="calc.js"></script>
+<script src="market.js"></script>
+<script src="report.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

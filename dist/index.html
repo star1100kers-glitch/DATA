@@ -1,0 +1,1516 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>사업계획서</title>
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #fff; --text: #1d2330; --muted: #6b7280;
+    --line: #e2e5ea; --accent: #1f4e8c; --accent-soft: #e8eef7; --danger: #c0261b;
+    --ok-bg: #e3f4e8; --ok-fg: #17663a; --ng-bg: #fbe4e2; --ng-fg: #a3231a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: "Pretendard", "Malgun Gothic", "Apple SD Gothic Neo", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.55;
+  }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+
+  /* 버튼 */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center; }
+  .toolbar span { color: var(--muted); font-size: 13px; margin-right: 4px; }
+  .toolbar .spacer { flex: 1; }
+  button {
+    font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--card); color: var(--text); padding: 7px 14px;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.preset { background: var(--accent-soft); border-color: transparent; color: var(--accent); font-weight: 600; }
+  button.preset:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { color: #fff; opacity: .9; }
+  button.ghost { border: none; background: none; color: var(--muted); padding: 4px 8px; }
+  button.ghost:hover { color: var(--danger); }
+
+  /* 입력 폼 */
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+  .panel h2 { font-size: 15px; margin: 0 0 14px; color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .grid.two { grid-template-columns: 1fr 1fr; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input {
+    width: 100%; font: inherit; padding: 8px 10px; border: 1px solid var(--line);
+    border-radius: 6px; background: #fff; color: var(--text);
+  }
+  input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  input.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .unit { position: relative; }
+  .unit input { padding-right: 44px; }
+  .unit em { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-style: normal; color: var(--muted); font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; }
+  .form-units th { font-size: 13px; color: var(--muted); font-weight: 500; text-align: left; padding: 0 6px 6px; }
+  .form-units th.r { text-align: right; }
+  .form-units td { padding: 4px 6px; }
+  td.sub-total { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; font-size: 14px; }
+  .form-units tfoot td { border-top: 1px solid var(--line); padding-top: 10px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .form-units tfoot td.r { text-align: right; }
+  .table-actions { margin-top: 10px; }
+  .table-wrap { overflow-x: auto; }
+
+  /* 사업계획서 문서 */
+  .doc { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 32px; margin-top: 28px; }
+  .doc-head { border-bottom: 2px solid var(--text); padding-bottom: 12px; margin-bottom: 8px; }
+  .doc-head h1 { font-size: 24px; }
+  .doc-head p { margin: 0; color: var(--muted); font-size: 14px; }
+  .chapter { padding: 22px 0 6px; border-bottom: 1px solid var(--line); }
+  .chapter:last-child { border-bottom: none; }
+  .chapter h2 { font-size: 18px; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+  .chapter h2 .no {
+    display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--accent); color: #fff; font-size: 14px; flex: none;
+  }
+  .chapter h3 { font-size: 14px; margin: 18px 0 8px; color: var(--accent); }
+  .chapter h3 small, .grid-table small, .sens small { color: var(--muted); font-weight: 400; }
+  .basis { color: var(--muted); font-size: 13px; margin: 0 0 8px; }
+
+  .metrics { border-top: 1px solid var(--line); }
+  .metric {
+    display: grid; grid-template-columns: 150px 140px 1fr; gap: 4px 16px; align-items: baseline;
+    padding: 8px 4px; border-bottom: 1px solid var(--line);
+  }
+  .m-label { color: var(--text); }
+  .m-value { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .m-formula { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .metric.key .m-value { font-size: 18px; color: var(--accent); }
+  .metric.total { border-top: 2px solid var(--text); border-bottom: none; }
+  .metric.total .m-label, .metric.total .m-value { font-weight: 700; }
+
+  .neg { color: var(--danger) !important; }
+  .na { color: var(--muted); font-weight: 400; font-style: italic; }
+  .empty {
+    border: 1px dashed var(--line); border-radius: 8px; padding: 16px; color: var(--muted);
+    background: #fafbfc; display: flex; flex-direction: column; gap: 4px;
+  }
+  .empty b { color: var(--text); }
+  .empty span { font-size: 13px; }
+
+  .grid-table th { font-size: 13px; color: var(--muted); font-weight: 500; text-align: left; padding: 6px; border-bottom: 1px solid var(--line); }
+  .grid-table td { padding: 6px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .grid-table .r { text-align: right; }
+  .grid-table .b { font-weight: 700; }
+  .grid-table tfoot td { font-weight: 700; border-bottom: none; }
+
+  table.sens { border-collapse: separate; border-spacing: 3px; }
+  table.sens th { text-align: right; padding: 4px 8px; white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--muted); }
+  table.sens th.plan { color: var(--accent); font-weight: 700; }
+  table.sens th.row { text-align: left; }
+  table.sens td { text-align: right; padding: 8px; border-radius: 4px; font-variant-numeric: tabular-nums; font-size: 14px; }
+  table.sens td.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  table.sens td.ng { background: var(--ng-bg); color: var(--ng-fg); }
+  table.sens td.plan { outline: 2px solid var(--accent); font-weight: 700; }
+  .verdict { margin: 14px 0 0; font-weight: 700; font-size: 16px; }
+  .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 10px; vertical-align: middle; }
+  .badge.ok { background: var(--ok-bg); color: var(--ok-fg); }
+  .badge.ng { background: var(--ng-bg); color: var(--ng-fg); }
+  .risk { border-left: 4px solid var(--ok-fg); padding: 2px 0 2px 14px; margin: 14px 0; }
+  .risk.ng { border-left-color: var(--danger); }
+  .risk h3 { color: var(--text); margin: 0 0 6px; font-size: 15px; }
+  .risk p { margin: 0 0 6px; }
+  .risk ul, .unverified { margin: 0; padding-left: 20px; }
+  .risk li { color: var(--muted); }
+  .unverified li { margin: 4px 0; }
+  .m-label small { color: var(--muted); font-size: 12px; }
+  .metric.text .m-value { grid-column: 2 / -1; text-align: left; }
+
+  /* 2장 시장 분석 */
+  .progress { display: inline-block; font-size: 13px; color: var(--muted); background: #f1f3f6; border-radius: 12px; padding: 2px 12px; margin: 0 0 4px; font-variant-numeric: tabular-nums; }
+  .progress.busy::before { content: "⟳ "; }
+  .meta { display: grid; grid-template-columns: 72px 1fr; gap: 2px 12px; margin: 8px 0 4px; font-size: 12.5px; color: var(--muted); background: #fafbfc; border-radius: 6px; padding: 8px 12px; }
+  .meta div { display: contents; }
+  .meta dt { font-weight: 600; color: var(--text); }
+  .meta dd { margin: 0; }
+  button.retry { font-size: 12px; padding: 1px 8px; margin-left: 4px; }
+  .errmsg { font-size: 11.5px; color: var(--muted); max-width: 220px; margin-left: auto; white-space: normal; }
+  .grid-table small { font-size: 12px; }
+  .metric.text .m-formula { display: none; }
+  .cands { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .cands .cand { font-size: 13px; padding: 3px 10px; }
+  .cands .cand small { color: var(--muted); margin-left: 4px; }
+
+  /* 차트 (SVG) */
+  .chart-box { margin: 8px 0 0; padding: 0; }
+  svg.chart { display: block; width: 100%; height: auto; max-width: 720px; font-family: inherit; }
+  svg.chart .grid { stroke: var(--line); stroke-width: 1; }
+  svg.chart .axis, svg.chart .zero { stroke: var(--muted); stroke-width: 1; }
+  svg.chart .tick, svg.chart .unit, svg.chart .note { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  svg.chart .cat { fill: var(--text); font-size: 12.5px; font-weight: 600; }
+  svg.chart .val { fill: var(--text); font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  svg.chart .val.neg { fill: var(--danger); }
+  svg.chart .bar-total { fill: var(--accent); }
+  svg.chart .bar-neg { fill: var(--danger); }
+  svg.chart .bar-down { fill: #e7a29b; }
+  svg.chart .bar-up { fill: #7cc39a; }
+  svg.chart .link { stroke: var(--muted); stroke-dasharray: 3 3; }
+  svg.chart .pt { fill: var(--text); fill-opacity: .75; stroke: #fff; stroke-width: 1.5; }
+  svg.chart .line-plan { stroke: var(--accent); stroke-width: 2; }
+  svg.chart .line-repay { stroke: var(--danger); stroke-width: 2; stroke-dasharray: 6 4; }
+  svg.chart .lbl-plan { fill: var(--accent); font-size: 12px; font-weight: 700; }
+  svg.chart .lbl-repay { fill: var(--danger); font-size: 12px; font-weight: 700; }
+  svg.chart .band-ok { fill: var(--ok-bg); }
+  svg.chart .band-ng { fill: var(--ng-bg); }
+  .chart-meta { grid-template-columns: 56px 1fr; }
+
+  /* 휴대폰: 세로 1열 */
+  @media (max-width: 640px) {
+    main { padding: 20px 16px 48px; }
+    .grid.two { grid-template-columns: 1fr; }
+    .form-units { min-width: 540px; }
+    .doc { padding: 18px 16px; }
+    .metric { grid-template-columns: 1fr auto; }
+    .m-formula { grid-column: 1 / -1; }
+    table.sens { min-width: 600px; }
+    .chart-box { overflow-x: auto; }
+    svg.chart { min-width: 520px; }
+  }
+
+  /* 인쇄: A4 문서 (입력 폼 숨김) */
+  @page { size: A4; margin: 16mm 14mm; }
+  @media print {
+    body { background: #fff; font-size: 10pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    main { max-width: none; padding: 0; }
+    .no-print { display: none !important; }
+    .doc { border: none; padding: 0; margin: 0; border-radius: 0; }
+    .table-wrap { overflow: visible; }
+    table.sens { min-width: 0; }
+    table.sens td { padding: 5px 6px; font-size: 9.5pt; }
+    .metric { grid-template-columns: 34mm 30mm 1fr; padding: 5px 2px; }
+    .m-formula { grid-column: auto; font-size: 8.5pt; }
+    .chapter h2 { break-after: avoid; }
+    .chapter h3 { break-after: avoid; }
+    .metric, table, .risk, .empty, .verdict { break-inside: avoid; }
+    #ch5, #ch6 { break-before: page; }
+    .progress, .errmsg { display: none; }
+    .meta { break-inside: avoid; }
+    .chart-box { break-inside: avoid; }
+    svg.chart { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <div class="no-print">
+    <h1>사업계획서 작성</h1>
+    <p class="sub">대주단 제출용 · 입력값 기반 계산</p>
+
+    <div class="toolbar">
+      <span>임시 값</span>
+      <button class="preset" data-preset="A">A 해운대 그린테라스</button>
+      <button class="preset" data-preset="B">B 영통 센트럴파크</button>
+      <button class="preset" data-preset="C">C 유성 리버뷰</button>
+      <button class="ghost" id="clear">초기화</button>
+      <span class="spacer"></span>
+      <button class="primary" id="print">인쇄 · PDF</button>
+    </div>
+
+    <form id="form" autocomplete="off" onsubmit="return false">
+      <section class="panel">
+        <h2>사업 개요</h2>
+        <div class="grid two">
+          <div><label for="name">사업명</label><input id="name" placeholder="예: 해운대 그린테라스"></div>
+          <div><label for="site">사업대상지</label><input id="site" placeholder="예: 부산광역시 해운대구"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>주택형</h2>
+        <div class="table-wrap">
+          <table class="form-units">
+            <thead>
+              <tr>
+                <th style="width:20%">이름</th>
+                <th class="r" style="width:18%">전용㎡</th>
+                <th class="r" style="width:18%">공급평</th>
+                <th class="r" style="width:16%">세대수</th>
+                <th class="r" style="width:20%">공급면적(평)</th>
+                <th style="width:8%"></th>
+              </tr>
+            </thead>
+            <tbody id="units"></tbody>
+            <tfoot>
+              <tr>
+                <td>합계</td><td></td><td></td>
+                <td class="r" id="sumHH">0</td>
+                <td class="r" id="sumArea">0.0</td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="table-actions"><button type="button" id="addRow">+ 행 추가</button></div>
+      </section>
+
+      <section class="panel">
+        <h2>분양 · 수입</h2>
+        <div class="grid">
+          <div><label for="price">평당가</label><div class="unit"><input class="num" id="price" inputmode="decimal"><em>만원</em></div></div>
+          <div><label for="retail">상가</label><div class="unit"><input class="num" id="retail" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="other">기타유입</label><div class="unit"><input class="num" id="other" inputmode="decimal"><em>억원</em></div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>비용 · 금융</h2>
+        <div class="grid">
+          <div><label for="fixed">고정비</label><div class="unit"><input class="num" id="fixed" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="pf">본PF</label><div class="unit"><input class="num" id="pf" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="pfCost">본PF 금융비용</label><div class="unit"><input class="num" id="pfCost" inputmode="decimal"><em>억원</em></div></div>
+          <div><label for="sub">후순위</label><div class="unit"><input class="num" id="sub" inputmode="decimal"><em>억원</em></div></div>
+        </div>
+      </section>
+    </form>
+  </div>
+
+  <article class="doc">
+    <header class="doc-head">
+      <h1 id="docTitle">사업계획서</h1>
+      <p id="docSub"></p>
+    </header>
+    <div id="report"></div>
+  </article>
+</main>
+
+<script>/* presets.js */
+// 임시 값 A·B·C (화면 버튼과 검산 테스트에서 함께 사용)
+// units: [이름, 전용㎡, 공급평, 세대수] · 금액 단위: 평당가 만원, 나머지 억원
+(function (root) {
+  const PRESETS = {
+    A: { name: "해운대 그린테라스", site: "부산광역시 해운대구",
+         units: [["59형", 59.9, 25.6, 200], ["84형", 84.9, 34.6, 320]],
+         price: 2420, retail: 150, other: 175, fixed: 3815.0, pf: 2450, pfCost: 480, sub: 400 },
+    B: { name: "영통 센트럴파크", site: "경기도 수원시 영통구",
+         units: [["59형", 59.8, 25.4, 300], ["84형", 84.9, 34.3, 480]],
+         price: 2650, retail: 180, other: 260, fixed: 6296.4, pf: 4100, pfCost: 820, sub: 600 },
+    C: { name: "유성 리버뷰", site: "대전광역시 유성구",
+         units: [["74형", 74.6, 30.8, 140], ["84형", 84.9, 34.5, 240]],
+         price: 1980, retail: 90, other: 120, fixed: 2461.2, pf: 1650, pfCost: 330, sub: 260 },
+  };
+
+  // 프리셋을 계산 모듈이 받는 입력 형태로 바꿉니다.
+  function toInput(p) {
+    return {
+      units: p.units.map(([name, excl, supply, households]) => ({ name, excl, supply, households })),
+      price: p.price, retail: p.retail, other: p.other, fixed: p.fixed,
+      pf: p.pf, pfCost: p.pfCost, sub: p.sub,
+    };
+  }
+
+  const out = { PRESETS, toInput };
+  if (typeof module !== "undefined" && module.exports) module.exports = out;
+  else root.Presets = out;
+})(this);
+
+</script>
+<script>/* calc.js */
+// 사업수지 계산 모듈 (화면과 분리)
+// 금액 단위: 억원 · 평당가: 만원 · 면적: 평 · 분양률: 0~1 (1 = 100%)
+// 브라우저에서는 window.Calc, Node에서는 require("./calc") 로 사용합니다.
+(function (root) {
+  "use strict";
+
+  // 고정 가정값
+  const SCHOOL_LEVY_RATE = 0.008; // 학교용지부담금: 분양수입의 0.8%
+  const AGENCY_FEE_PER_UNIT = 300 / 10000; // 분양대행 수수료: 세대당 300만원 = 0.03억원
+
+  // 주택형 표에서 공급면적 합계(평)를 구합니다. 각 행의 공급평 × 세대수를 더한 값입니다.
+  function totalSupplyArea(units) {
+    return units.reduce((sum, u) => sum + (Number(u.supply) || 0) * (Number(u.households) || 0), 0);
+  }
+
+  // 주택형 표에서 세대수 합계를 구합니다.
+  function totalHouseholds(units) {
+    return units.reduce((sum, u) => sum + (Number(u.households) || 0), 0);
+  }
+
+  // 분양수입(억원) = (공급면적 × 평당가 ÷ 10,000 + 상가) × 분양률
+  // 평당가가 만원 단위이므로 10,000으로 나눠 억원으로 맞춥니다.
+  function salesRevenue(input, rate) {
+    const aptRevenue = (totalSupplyArea(input.units) * input.price) / 10000;
+    return (aptRevenue + input.retail) * rate;
+  }
+
+  // 분양률에 따라 팔린 세대 수를 구합니다. (세대수 합계 × 분양률)
+  function soldHouseholds(input, rate) {
+    return totalHouseholds(input.units) * rate;
+  }
+
+  // 기말현금(억원) = 분양수입 × (1 − 학교용지 0.8%) − 팔린 세대 × 분양대행 300만원 + 기타유입 − 고정비
+  function endingCash(input, rate) {
+    const revenue = salesRevenue(input, rate);
+    return revenue * (1 - SCHOOL_LEVY_RATE)
+      - soldHouseholds(input, rate) * AGENCY_FEE_PER_UNIT
+      + input.other
+      - input.fixed;
+  }
+
+  // 만기 누적 DSCR = 1 + (기말현금 + 후순위) ÷ (본PF + 본PF 금융비용)
+  function maturityDscr(input, rate) {
+    return 1 + (endingCash(input, rate) + input.sub) / (input.pf + input.pfCost);
+  }
+
+  // LTV = 본PF ÷ 분양률 100%일 때의 분양수입 (분양률과 무관하게 항상 100% 기준)
+  function ltv(input) {
+    return input.pf / salesRevenue(input, 1);
+  }
+
+  // 한 번에 모든 결과를 계산합니다. 화면 표시와 검산에 함께 씁니다.
+  function feasibility(input, rate) {
+    const revenue = salesRevenue(input, rate);
+    const sold = soldHouseholds(input, rate);
+    return {
+      rate,
+      supplyArea: totalSupplyArea(input.units),
+      households: totalHouseholds(input.units),
+      soldHouseholds: sold,
+      revenue,
+      schoolLevy: revenue * SCHOOL_LEVY_RATE,
+      agencyFee: sold * AGENCY_FEE_PER_UNIT,
+      endingCash: endingCash(input, rate),
+      dscr: maturityDscr(input, rate),
+      ltv: ltv(input),
+    };
+  }
+
+  // 사업수지 폭포 차트용 단계: 분양수입 → 변동비 → 고정비 → 기타유입 → 기말현금
+  // 변동비 = 학교용지 + 분양대행. 각 단계의 시작(from)·끝(to)을 여기서 계산해 두고,
+  // 차트는 이 값을 그리기만 합니다. 마지막 단계의 값은 endingCash()와 같습니다.
+  function waterfallSteps(input, rate) {
+    const r = feasibility(input, rate);
+    const variable = r.schoolLevy + r.agencyFee;
+    const afterVar = r.revenue - variable;
+    const afterFixed = afterVar - input.fixed;
+    const afterOther = afterFixed + input.other;
+    return [
+      { key: "revenue", label: "분양수입", kind: "total", value: r.revenue, from: 0, to: r.revenue },
+      { key: "variable", label: "변동비", note: "학교용지 + 분양대행", kind: "down", value: -variable, from: r.revenue, to: afterVar },
+      { key: "fixed", label: "고정비", kind: "down", value: -input.fixed, from: afterVar, to: afterFixed },
+      { key: "other", label: "기타유입", kind: "up", value: input.other, from: afterFixed, to: afterOther },
+      { key: "endingCash", label: "기말현금", kind: "total", value: r.endingCash, from: 0, to: r.endingCash },
+    ];
+  }
+
+  // 상환 가능 여부: 기말현금이 −후순위 이상이면 본PF를 전액 상환할 수 있다고 봅니다.
+  function canRepay(input, rate) {
+    return endingCash(input, rate) >= -input.sub;
+  }
+
+  // 평당가만 바꾼 입력을 만듭니다. (원본 입력은 건드리지 않음)
+  function withPrice(input, price) {
+    return Object.assign({}, input, { price });
+  }
+
+  // 기말현금이 목표값(target)이 되는 분양률을 구합니다. (0~1, 평당가는 계획값)
+  // 기말현금은 분양률에 대해 직선이므로 바로 풀 수 있습니다.
+  //   기말현금 = 분양률 × [분양수입100% × (1 − 0.8%) − 세대수 × 0.03억] + 기타유입 − 고정비
+  // 분양률을 올려도 현금이 늘지 않으면(기울기 ≤ 0) 해가 없으므로 NaN을 돌려줍니다.
+  function breakevenRate(input, target) {
+    const slope = salesRevenue(input, 1) * (1 - SCHOOL_LEVY_RATE) - totalHouseholds(input.units) * AGENCY_FEE_PER_UNIT;
+    if (!(slope > 0)) return NaN;
+    return (target - input.other + input.fixed) / slope;
+  }
+
+  // 기말현금이 목표값(target)이 되는 평당가(만원)를 구합니다. 분양률은 rate (기본 100%)로 고정합니다.
+  //   목표 = 분양률 × [(공급면적 × 평당가 ÷ 10,000 + 상가) × (1 − 0.8%) − 세대수 × 0.03억] + 기타유입 − 고정비
+  // 를 평당가에 대해 거꾸로 풉니다.
+  function breakevenPrice(input, target, rate = 1) {
+    const area = totalSupplyArea(input.units);
+    if (!(area > 0) || !(rate > 0)) return NaN;
+    const perRate = (target - input.other + input.fixed) / rate + totalHouseholds(input.units) * AGENCY_FEE_PER_UNIT;
+    const revenueNeeded = perRate / (1 - SCHOOL_LEVY_RATE); // 필요한 분양수입(100% 기준, 상가 포함)
+    return ((revenueNeeded - input.retail) * 10000) / area;
+  }
+
+  // 두 한계선을 한 번에 구합니다.
+  //  - zero: 기말현금이 0이 되는 분양률 · 평당가
+  //  - repay: 기말현금이 −후순위가 되는 분양률 · 평당가 (= PF 전액 상환 한계)
+  // 평당가 한계는 분양률 100% 기준입니다.
+  function limits(input) {
+    return {
+      zero: { rate: breakevenRate(input, 0), price: breakevenPrice(input, 0, 1) },
+      repay: { rate: breakevenRate(input, -input.sub), price: breakevenPrice(input, -input.sub, 1) },
+    };
+  }
+
+  // 민감도 표를 만듭니다.
+  //  - 행: 분양률 (기본 75% ~ 100%, 5%p 간격)
+  //  - 열: 계획 평당가 대비 증감(만원) (기본 −500 ~ +100, 100만원 간격)
+  //  - 칸: 기말현금과 상환 가능 여부
+  function sensitivity(input, opts = {}) {
+    const rates = opts.rates || [0.75, 0.80, 0.85, 0.90, 0.95, 1.00];
+    const deltas = opts.priceDeltas || [-500, -400, -300, -200, -100, 0, 100];
+    const columns = deltas.map(d => ({ delta: d, price: input.price + d }));
+    const rows = rates.map(rate => ({
+      rate,
+      cells: columns.map(c => {
+        const scenario = withPrice(input, c.price);
+        return { endingCash: endingCash(scenario, rate), canRepay: canRepay(scenario, rate) };
+      }),
+    }));
+    return { columns, rows };
+  }
+
+  const Calc = {
+    SCHOOL_LEVY_RATE, AGENCY_FEE_PER_UNIT,
+    totalSupplyArea, totalHouseholds, salesRevenue, soldHouseholds,
+    endingCash, maturityDscr, ltv, feasibility,
+    canRepay, breakevenRate, breakevenPrice, limits, sensitivity, waterfallSteps,
+  };
+  if (typeof module !== "undefined" && module.exports) module.exports = Calc;
+  else root.Calc = Calc;
+})(this);
+
+</script>
+<script>/* market.js */
+// 실거래(분양권전매 · 전월세) 집계 모듈 — 서버와 화면이 함께 씀 (네트워크·인증키 없음)
+// 근거: 국토교통부 "아파트 분양권전매 실거래가 자료" · "아파트 전월세 실거래가 자료" 오픈API 활용가이드
+(function (root) {
+  "use strict";
+
+  const MONTHS = 12;                       // 최근 12개월
+  const BAND84 = { min: 83, max: 86 };     // "84㎡" = 전용 83㎡ 이상 86㎡ 미만
+  const in84 = a => a !== null && a >= BAND84.min && a < BAND84.max;
+  const KIND_LABEL = { silv: "분양권", rent: "전월세" };
+
+  // 숫자 읽기: "95,815" → 95815, 빈칸 → null
+  const num = s => { const n = parseFloat(String(s == null ? "" : s).replace(/,/g, "").trim()); return isFinite(n) ? n : null; };
+  const blank = s => !String(s == null ? "" : s).trim();
+
+  // 오늘이 속한 달을 포함한 최근 n개월(YYYYMM)을 오래된 달부터 돌려줍니다.
+  function recentMonths(today = new Date(), n = MONTHS) {
+    const out = [];
+    for (let i = n - 1; i >= 0; i--) {
+      const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      out.push(`${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}`);
+    }
+    return out;
+  }
+
+  // XML 특수문자 되돌리기
+  const decode = s => s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+
+  // XML 응답에서 결과코드 · 전체 건수 · item 목록을 뽑습니다. (응답 형식이 단순해 정규식으로 충분)
+  // 인증 오류는 공공데이터포털 공통 형식(OpenAPI_ServiceResponse)으로 옵니다.
+  function parseXml(xml) {
+    const tag = name => { const m = String(xml).match(new RegExp(`<${name}>([\\s\\S]*?)</${name}>`)); return m ? decode(m[1]).trim() : null; };
+    const items = [...String(xml).matchAll(/<item>([\s\S]*?)<\/item>/g)].map(m => {
+      const o = {};
+      for (const f of m[1].matchAll(/<(\w+)>([\s\S]*?)<\/\1>|<(\w+)\s*\/>/g)) {
+        if (f[1]) o[f[1]] = decode(f[2]); else o[f[3]] = "";
+      }
+      return o;
+    });
+    return {
+      resultCode: tag("resultCode"), resultMsg: tag("resultMsg"), totalCount: num(tag("totalCount")),
+      items, authError: tag("returnAuthMsg") || (tag("errMsg") && tag("returnReasonCode") ? tag("errMsg") : null),
+    };
+  }
+
+  // 분양권전매 한 달 요약: 해제여부(cdealType)가 표시된 거래는 뺍니다.
+  function summarizeSilv(items) {
+    const cancelled = items.filter(i => !blank(i.cdealType)).length;
+    return { total: items.length, cancelled, count: items.length - cancelled };
+  }
+
+  // 전월세 한 달 요약
+  //  - 기술문서에 해제 항목은 없지만, cdealType 값이 오면 해제로 보고 뺍니다.
+  //  - 전세 = 월세금액(monthlyRent) 0, 월세 = 0보다 큼
+  //  - 84㎡ 신규 전세(잔금 여력 표용): 84㎡ 중 월세 → 갱신 → 계약구분 미기재 순으로 빼고 남은 보증금
+  function summarizeRent(items) {
+    const s = { total: items.length, cancelled: 0, count: 0, jeonse: 0, wolse: 0, n84: 0, x84: { wolse: 0, renew: 0, unknown: 0 }, q84: [] };
+    for (const i of items) {
+      if (!blank(i.cdealType)) { s.cancelled++; continue; }
+      s.count++;
+      const jeonse = (num(i.monthlyRent) || 0) === 0;
+      if (jeonse) s.jeonse++; else s.wolse++;
+      if (!in84(num(i.excluUseAr))) continue;
+      s.n84++;
+      const type = String(i.contractType || "").trim();
+      if (!jeonse) s.x84.wolse++;
+      else if (type === "갱신") s.x84.renew++;
+      else if (type !== "신규") s.x84.unknown++;
+      else { const d = num(i.deposit); if (d !== null) s.q84.push(d); else s.x84.unknown++; }
+    }
+    return s;
+  }
+
+  // ── 인근 신규 공급 평당가 (청약홈 분양정보) ──
+  const M2_PER_PYEONG = 400 / 121; // 1평 = 3.3058㎡
+  const SUPPLY_MONTHS = 24;        // 모집공고일 기준 최근 24개월
+
+  // 공고 1건 + 주택형 목록 → 차트 점 1개 (단지 1개)
+  //  점 = 84㎡ 주택형들의 (분양최고금액 ÷ 공급평) 평균, 만원/평
+  //  주택형(HOUSE_TY)은 전용면적("084.9800A")이라 84㎡ 판정에 쓰고, 평당가는 공급면적(SUPLY_AR) 기준
+  //  임대 공고 · 84㎡ 주택형이 없는 단지는 빼고 이유를 돌려줍니다.
+  function supplyPoint(notice, models) {
+    if (String(notice.RENT_SECD || "0") !== "0") return { excluded: "rent" };
+    const per = (models || [])
+      .filter(m => in84(num(String(m.HOUSE_TY || "").replace(/[^\d.]/g, ""))))
+      .map(m => ({ amount: num(m.LTTOT_TOP_AMOUNT), ar: num(m.SUPLY_AR) }))
+      .filter(m => m.amount > 0 && m.ar > 0)
+      .map(m => m.amount / (m.ar / M2_PER_PYEONG));
+    if (!per.length) return { excluded: "no84" };
+    const date = String(notice.RCRIT_PBLANC_DE || "");
+    return {
+      point: {
+        label: notice.HOUSE_NM || "", date, ym: date.slice(0, 7),
+        price: per.reduce((a, b) => a + b, 0) / per.length, types: per.length,
+        address: notice.HSSPLY_ADRES || "", no: notice.HOUSE_MANAGE_NO || "",
+      },
+    };
+  }
+
+  const ymLabel = ym => `${ym.slice(0, 4)}.${ym.slice(4)}`;
+
+  // 화면 상태(달별 결과)를 2장 표 두 개로 묶습니다.
+  // state = { name, code, months:[YYYYMM], silv:{ym:{status,summary,fetchedAt,message}}, rent:{...} }
+  // units · price: 우리 사업 주택형과 평당가(만원) → 84㎡ 세대당 분양가 = 공급평 × 평당가
+  function buildMarket(state, units = [], price = null) {
+    const months = state.months || [];
+    const cell = (kind, ym) => (state[kind] && state[kind][ym]) || { status: "loading" };
+    const done = kind => months.filter(ym => ["ok", "error"].includes(cell(kind, ym).status)).length;
+    const okMonths = kind => months.filter(ym => cell(kind, ym).status === "ok");
+    const sum = (kind, f) => okMonths(kind).reduce((a, ym) => a + f(cell(kind, ym).summary), 0);
+    const dates = [...new Set(["silv", "rent"].flatMap(k => okMonths(k).map(ym => String(cell(k, ym).fetchedAt || "").slice(0, 10))).filter(Boolean))].sort();
+
+    const table1 = {
+      rows: months.map(ym => ({ ym, label: ymLabel(ym), silv: cell("silv", ym), rent: cell("rent", ym) })),
+      totals: {
+        silv: sum("silv", s => s.count), silvCancelled: sum("silv", s => s.cancelled),
+        rent: sum("rent", s => s.count), rentCancelled: sum("rent", s => s.cancelled),
+        jeonse: sum("rent", s => s.jeonse), wolse: sum("rent", s => s.wolse),
+      },
+      progress: { silv: done("silv"), rent: done("rent"), total: months.length },
+      okMonths: { silv: okMonths("silv").length, rent: okMonths("rent").length },
+      errors: ["silv", "rent"].flatMap(k => months.filter(ym => cell(k, ym).status === "error").map(ym => ({ kind: k, ym }))),
+    };
+
+    const deposits = okMonths("rent").flatMap(ym => cell("rent", ym).summary.q84);
+    const avg = deposits.length ? deposits.reduce((a, b) => a + b, 0) / deposits.length : null;
+    const ours = (price === null ? [] : units)
+      .filter(u => in84(num(u.excl)) && num(u.supply) !== null)
+      .map(u => {
+        const unitPrice = num(u.supply) * price; // 만원
+        return { name: u.name || "", excl: num(u.excl), supply: num(u.supply), unitPrice, ratio: avg !== null && unitPrice > 0 ? avg / unitPrice : null };
+      });
+    const table2 = {
+      avg, n: deposits.length,
+      monthsUsed: okMonths("rent").length,
+      rentCount: sum("rent", s => s.count),
+      n84: sum("rent", s => s.n84),
+      excluded: {
+        wolse: sum("rent", s => s.x84.wolse), renew: sum("rent", s => s.x84.renew),
+        unknown: sum("rent", s => s.x84.unknown), non84: sum("rent", s => s.count - s.n84),
+      },
+      ours,
+    };
+    return { table1, table2, dates };
+  }
+
+  const Market = { MONTHS, BAND84, KIND_LABEL, M2_PER_PYEONG, SUPPLY_MONTHS, in84, num, recentMonths, parseXml, summarizeSilv, summarizeRent, supplyPoint, buildMarket, ymLabel };
+  if (typeof module !== "undefined" && module.exports) module.exports = Market;
+  else root.Market = Market;
+})(this);
+
+</script>
+<script>/* report.js */
+// 사업계획서 7개 장 구성 모듈 (화면 없이 데이터만 만듭니다 · 계산은 calc.js)
+// 원칙: 비어 있는 입력은 0으로 채우지 않고 "자료 없음"으로 남깁니다.
+// 브라우저에서는 window.Report, Node에서는 require("./report") 로 사용합니다.
+(function (root) {
+  "use strict";
+  const isNode = typeof module !== "undefined" && module.exports;
+  const Calc = isNode ? require("./calc") : root.Calc;
+  const Market = isNode ? require("./market") : root.Market;
+  const KIND_LABEL = Market.KIND_LABEL;
+
+  // 입력 항목 이름 (빠진 항목 안내에 사용)
+  const LABELS = {
+    name: "사업명", site: "사업대상지", units: "주택형(공급평·세대수)",
+    price: "평당가", retail: "상가", other: "기타유입", fixed: "고정비",
+    pf: "본PF", pfCost: "본PF 금융비용", sub: "후순위",
+  };
+  const CASH_KEYS = ["units", "price", "retail", "other", "fixed"]; // 사업수지에 필요한 입력
+  const FUND_KEYS = [...CASH_KEYS, "pf", "pfCost", "sub"];          // 자금조달·민감도·리스크에 필요한 입력
+
+  const MARKET_EMPTY = "자료 없음 — 공공데이터 확인 필요";
+  const OUT_OF_SCOPE = "월별 자금수지 · IRR은 이 앱의 범위 밖";
+
+  const isNum = v => typeof v === "number" && isFinite(v);
+
+  // 숫자를 천단위 콤마 문자열로 바꿉니다. 음수는 "−" 기호를 붙입니다.
+  function f(n, d = 0) {
+    const s = Math.abs(n).toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d });
+    const isZero = !/[1-9]/.test(s);
+    return (n < 0 && !isZero ? "−" : "") + s;
+  }
+  // 0~1 비율을 "80.6%" 형태로 바꿉니다.
+  const pct = (r, d = 1) => f(r * 100, d) + "%";
+
+  // 주택형 표를 정리합니다. 완전히 빈 행은 버리고, 남은 행은 공급평·세대수가 모두 있어야 유효합니다.
+  function cleanUnits(units = []) {
+    const rows = units.filter(u =>
+      (u.name && String(u.name).trim()) || isNum(u.excl) || isNum(u.supply) || isNum(u.households));
+    const complete = rows.length > 0
+      && rows.every(u => isNum(u.supply) && isNum(u.households))
+      && Calc.totalSupplyArea(rows) > 0;
+    return { rows, complete };
+  }
+
+  // 입력 항목 하나가 비었는지 확인합니다.
+  function isMissing(raw, key) {
+    if (key === "units") return !cleanUnits(raw.units).complete;
+    if (key === "name" || key === "site") return !(raw[key] && String(raw[key]).trim());
+    return !isNum(raw[key]);
+  }
+
+  // 주어진 항목 중 빠진 것의 이름 목록을 돌려줍니다.
+  function lack(raw, keys) {
+    return keys.filter(k => isMissing(raw, k)).map(k => LABELS[k]);
+  }
+
+  // 화면 입력(빈칸은 null)을 계산 모듈 입력으로 바꿉니다. 필요한 항목이 다 있을 때만 호출합니다.
+  function toInput(raw) {
+    const num = k => (isNum(raw[k]) ? raw[k] : 0);
+    return {
+      units: cleanUnits(raw.units).rows,
+      price: num("price"), retail: num("retail"), other: num("other"), fixed: num("fixed"),
+      pf: num("pf"), pfCost: num("pfCost"), sub: num("sub"),
+    };
+  }
+
+  // 표 아래 자동 문장: "평당 OOO만원 / 분양률 OO% 이상이면 상환 가능"
+  // "이상이면"이 참이 되도록 한계값은 올림합니다. (평당가 1만원, 분양률 0.1%p 단위)
+  function repaySentence(input) {
+    const L = Calc.limits(input);
+    if (!isFinite(L.repay.price) || !isFinite(L.repay.rate)) return null;
+    const pUp = Math.ceil(L.repay.price - 1e-9);
+    const rUp = Math.ceil(L.repay.rate * 1000 - 1e-9) / 10;
+    if (rUp > 100) return `계획 평당가로는 분양률 100%에서도 상환 불가 — 평당 ${f(pUp)}만원 이상(분양률 100%)이어야 상환 가능`;
+    return `평당 ${f(pUp)}만원 / 분양률 ${f(rUp, 1)}% 이상이면 상환 가능`;
+  }
+
+  // 6장: 두 한계선(기말현금 0 · 상환 한계)에서 거꾸로 짚은 리스크와 완화 방안
+  function buildRisks(input, rate) {
+    const L = Calc.limits(input);
+    const H = Calc.totalHouseholds(input.units);
+    const area = Calc.totalSupplyArea(input.units);
+    const ec = Calc.endingCash(input, rate);
+    const sub = input.sub, plan = input.price;
+    // 분양률 1.0(100%p) 변화당 기말현금 변화(억원)
+    const perRate = Calc.salesRevenue(input, 1) * (1 - Calc.SCHOOL_LEVY_RATE) - H * Calc.AGENCY_FEE_PER_UNIT;
+    // 평당가 10만원 변화당 기말현금 변화(억원)
+    const per10 = (10 * area / 10000) * (1 - Calc.SCHOOL_LEVY_RATE) * rate;
+    const items = [];
+
+    // ① 분양률 하락
+    {
+      const r = L.repay.rate, z = L.zero.rate;
+      let finding;
+      if (r > rate) {
+        finding = `계획 분양률 ${pct(rate, 0)}에서도 기말현금이 −후순위에 못 미쳐 PF 전액 상환이 불가합니다. 상환 한계 분양률은 ${pct(r)}입니다.`;
+      } else {
+        finding = `분양률이 ${pct(r)} 아래로 내려가면 PF 전액 상환이 불가합니다. 계획 ${pct(rate, 0)} 대비 여유는 ${f((rate - r) * 100, 1)}%p, 약 ${f(Math.floor((rate - r) * H))}세대입니다.`;
+        finding += z <= rate
+          ? ` 분양률 ${pct(z)} 미만부터는 기말현금이 음수가 되어 후순위가 손실을 부담합니다.`
+          : ` 계획 분양률에서도 기말현금이 음수라 후순위가 손실을 부담합니다.`;
+      }
+      items.push({
+        title: "분양률 하락", ok: r <= rate, finding,
+        mitigation: [
+          `고정비 100억원 절감 또는 후순위 100억원 증액 시 상환 한계 분양률 ${f(100 / perRate * 100, 1)}%p 하락`,
+          `분양률 ${pct(r)}를 관리 하한으로 두고 분양 실적을 대주단과 정기 공유 · 미달 시 조치 기준을 사전 약정`,
+        ],
+      });
+    }
+
+    // ② 분양가(평당가) 하락
+    {
+      const p = L.repay.price, pz = L.zero.price;
+      let finding;
+      const mitigation = [`평당가 10만원 변동 = 기말현금 ${f(per10, 1)}억원 변동 (분양률 ${pct(rate, 0)} 기준)`];
+      if (p > plan) {
+        finding = `분양률 100%여도 평당가가 ${f(p)}만원 이상이어야 상환 가능합니다. 계획 평당가 ${f(plan)}만원보다 ${f(p - plan)}만원 높습니다.`;
+        mitigation.push(`계획 평당가에서 상환 가능하려면 고정비 ${f(-sub - Calc.endingCash(input, 1), 1)}억원 절감 또는 동액 수입 증대 필요`);
+      } else {
+        finding = `평당가가 ${f(p)}만원 아래로 내려가면(분양률 100% 기준) PF 전액 상환이 불가합니다. 계획 ${f(plan)}만원 대비 ${f(p - plan)}만원(${f((p / plan - 1) * 100, 1)}%)까지 허용됩니다. 기말현금이 0이 되는 평당가는 ${f(pz)}만원입니다.`;
+        mitigation.push(`할인 분양은 평당 ${f(Math.floor(plan - p))}만원 이내에서 결정하고, 그 이상은 대주단 사전 협의 대상으로 약정`);
+      }
+      items.push({ title: "분양가 하락", ok: p <= plan, finding, mitigation });
+    }
+
+    // ③ 분양률 · 분양가 동시 하락 (민감도 표 기준)
+    {
+      const S = Calc.sensitivity(input);
+      const cells = S.rows.flatMap(r => r.cells);
+      const okCount = cells.filter(c => c.canRepay).length;
+      const combo = { ...input, price: plan - 100 };
+      const ec2 = Calc.endingCash(combo, 0.9);
+      const ok2 = Calc.canRepay(combo, 0.9);
+      items.push({
+        title: "분양률 · 분양가 동시 하락", ok: ok2,
+        finding: `분양률 90% · 평당가 −100만원이 함께 오면 기말현금 ${f(ec2, 1)}억원으로 상환 ${ok2 ? "가능" : "불가"}합니다. 민감도 표 ${cells.length}칸 중 ${okCount}칸이 상환 가능합니다.`,
+        mitigation: [
+          "분양률과 평당가를 따로가 아니라 조합으로 관리 — 민감도 표의 상환 가능(초록) 영역 안에서 분양 전략 수립",
+        ],
+      });
+    }
+
+    // ④ 비용 초과 (계획 기준 기말현금이 곧 비용 증가 허용폭)
+    {
+      const okCost = ec + sub >= 0;
+      const finding = okCost
+        ? `계획 기준 기말현금은 ${f(ec, 1)}억원입니다. 고정비가 ${f(Math.max(ec, 0), 1)}억원 넘게 늘면 기말현금이 음수, ${f(ec + sub, 1)}억원 넘게 늘면 PF 전액 상환이 불가합니다.`
+        : `계획 기준 기말현금 ${f(ec, 1)}억원으로 이미 −후순위(${f(-sub, 1)}억원)에 못 미칩니다. ${f(-sub - ec, 1)}억원의 비용 절감 또는 수입 증대가 필요합니다.`;
+      items.push({
+        title: "비용 초과", ok: okCost, finding,
+        mitigation: [
+          "고정비 내역(토지비·공사비·금융비 등) 검증과 공사비 증액 상한 약정 — 이 앱은 고정비를 총액으로만 받음",
+        ],
+      });
+    }
+    return items;
+  }
+
+  // 지역 확인 상태를 한 줄 설명으로 (7장 · 화면 공통)
+  const REGION_REASON = {
+    empty: "사업대상지 미입력",
+    pending: "확인 중",
+    nokey: "공공데이터 인증키(.env.local) 미설정",
+    offline: "서버 없이 열려 조회 불가",
+    notfound: "일치하는 시군구 없음",
+    ambiguous: "정확히 하나로 맞는 시군구 없음 — 후보 중 선택 필요",
+    error: "조회 실패",
+  };
+
+  // 7장: 확인하지 못한 것
+  function buildUnverified(raw, region, market) {
+    const list = [];
+    if (market && market.ok) {
+      const t1 = market.table1;
+      const fails = t1.errors.length;
+      if (fails) list.push(`실거래 조회 실패 ${fails}개월 — ${t1.errors.map(e => `${KIND_LABEL[e.kind]} ${e.ym.slice(0, 4)}.${e.ym.slice(4)}`).join(" · ")}`);
+      list.push("실거래 최근 1~2개월은 신고 기한(계약 후 30일)이 지나지 않아 덜 집계될 수 있음");
+      const sup = market.supply;
+      if (!sup || sup.status !== "ok") list.push(`인근 신규 공급 평당가 미확인${sup && sup.message ? ` — ${sup.message}` : ""}`);
+      else list.push("인근 신규 공급 평당가는 84㎡ 주택형의 분양최고금액 기준 — 옵션 · 발코니 확장비 · 실제 계약가는 반영 안 됨");
+      list.push("청약 경쟁률 · 미분양 현황은 아직 반영하지 않음");
+    } else {
+      list.push("시장 분석 자료 — 실거래 · 분양가 · 청약 경쟁률 · 미분양 현황 (공공데이터 확인 필요)");
+    }
+    list.push(OUT_OF_SCOPE);
+    if (!region || region.status !== "ok") {
+      const why = region ? REGION_REASON[region.status] || region.status : "확인 안 함";
+      list.push(`사업대상지 법정동코드 미확인 — ${why}${region && region.message ? ` (${region.message})` : ""}`);
+    }
+    const missing = lack(raw, Object.keys(LABELS));
+    if (missing.length) list.push(`비어 있는 입력 — ${missing.join(" · ")}`);
+    list.push(
+      "학교용지 0.8% · 분양대행 세대당 300만원은 앱 고정 가정 — 사업장별 고지·계약 기준 확인 필요",
+      "고정비는 총액 하나로만 입력 — 세부 내역 미검증",
+      "분양률은 아파트와 상가에 같은 비율로 적용",
+      "입력값(면적 · 평당가 · 차입 조건) 자체의 근거 자료는 앱에서 확인하지 않음",
+    );
+    return list;
+  }
+
+  // 사업계획서 전체를 만듭니다. raw의 빈칸은 null(또는 빈 문자열)입니다.
+  // region: 서버의 지역 확인 결과 { status: "ok", name, code } 등 (없으면 미확인)
+  // marketState: 서버에서 받은 실거래 달별 결과 (없으면 2장은 "자료 없음")
+  function buildReport(raw, rate = 1, region = null, marketState = null) {
+    const units = cleanUnits(raw.units);
+    const cashLack = lack(raw, CASH_KEYS);
+    const fundLack = lack(raw, FUND_KEYS);
+    const input = toInput(raw);
+    // 2장: 확인된 지역의 실거래가 있을 때만 표를 만듭니다. 84㎡ 분양가는 평당가가 있을 때만.
+    const market = marketState && marketState.months && marketState.months.length
+      ? { ok: true, name: marketState.name, code: marketState.code, loading: !marketState.done, supply: marketState.supply || null,
+          ...Market.buildMarket(marketState, units.rows, isNum(raw.price) ? raw.price : null) }
+      : { ok: false, message: MARKET_EMPTY };
+
+    // 1장: 있는 값만 보여주고 없는 값은 null (화면에서 "자료 없음")
+    const overview = {
+      empty: ["name", "site", "units", "price", "retail"].every(k => isMissing(raw, k)) && units.rows.length === 0,
+      name: isMissing(raw, "name") ? null : String(raw.name).trim(),
+      site: isMissing(raw, "site") ? null : String(raw.site).trim(),
+      units: units.rows,
+      unitsComplete: units.complete,
+      supplyArea: units.complete ? Calc.totalSupplyArea(units.rows) : null,
+      households: units.complete ? Calc.totalHouseholds(units.rows) : null,
+      price: isNum(raw.price) ? raw.price : null,
+      retail: isNum(raw.retail) ? raw.retail : null,
+      // 확인된 지역은 이름이 정확히 하나로 맞은 경우(status "ok")만 채웁니다.
+      region: region || { status: "empty" },
+      regionName: region && region.status === "ok" ? region.name : null,
+      regionCode: region && region.status === "ok" ? region.code : null,
+    };
+
+    const feasibility = cashLack.length
+      ? { ok: false, lack: cashLack }
+      : { ok: true, input, result: Calc.feasibility(input, rate), waterfall: Calc.waterfallSteps(input, rate) };
+
+    let funding, sensitivity, risks;
+    if (fundLack.length) {
+      funding = sensitivity = risks = { ok: false, lack: fundLack };
+    } else {
+      const result = Calc.feasibility(input, rate);
+      funding = {
+        ok: true, input, result,
+        debt: input.pf + input.pfCost,
+        canRepay: Calc.canRepay(input, rate),
+        margin: result.endingCash + input.sub,
+      };
+      sensitivity = {
+        ok: true, input,
+        limits: Calc.limits(input),
+        table: Calc.sensitivity(input),
+        sentence: repaySentence(input),
+      };
+      risks = { ok: true, items: buildRisks(input, rate) };
+    }
+
+    // 차트 ① 시장 대비 여유: 점(인근 신규 공급 평당가)은 공급가 자료가 연결될 때만 채워집니다.
+    //  분양권 전매가는 프리미엄이 붙은 거래가라 "신규 공급가"로 쓰지 않습니다.
+    const supply = marketState && marketState.supply;
+    const marketChart = {
+      status: supply ? supply.status : null,          // ok · loading · error · null(조회 안 함)
+      message: supply && supply.message ? supply.message : null,
+      points: supply && Array.isArray(supply.points) ? supply.points : [],
+      notices: supply && typeof supply.notices === "number" ? supply.notices : null,
+      excluded: supply && supply.excluded ? supply.excluded : null,
+      window: supply && supply.window ? supply.window : null,
+      source: supply && supply.source ? supply.source : null,
+      fetchedAt: supply && supply.fetchedAt ? supply.fetchedAt : null,
+      plan: isNum(raw.price) ? raw.price : null,
+      repay: sensitivity.ok && isFinite(sensitivity.limits.repay.price) ? sensitivity.limits.repay.price : null,
+    };
+
+    return {
+      rate,
+      marketChart,
+      missing: lack(raw, Object.keys(LABELS)),
+      overview,
+      market,
+      feasibility, funding, sensitivity, risks,
+      unverified: buildUnverified(raw, region, market),
+    };
+  }
+
+  const Report = { LABELS, MARKET_EMPTY, REGION_REASON, OUT_OF_SCOPE, f, pct, cleanUnits, isMissing, lack, toInput, repaySentence, buildRisks, buildReport };
+  if (typeof module !== "undefined" && module.exports) module.exports = Report;
+  else root.Report = Report;
+})(this);
+
+</script>
+<script>/* charts.js */
+// SVG 차트 (라이브러리 없음) — 이미 계산된 값을 받아 그리기만 합니다.
+// 축 눈금·좌표 변환 같은 "배치" 계산만 하고, 사업 숫자(합계·차이·비율)는 다시 계산하지 않습니다.
+// 데이터가 없으면 null을 돌려주고, 화면은 빈 축 대신 "자료 없음"을 보여줍니다.
+(function (root) {
+  "use strict";
+
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  // 천단위 콤마, 음수는 "−"
+  function f(n, d = 0) {
+    const s = Math.abs(n).toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d });
+    return (n < 0 && /[1-9]/.test(s) ? "−" : "") + s;
+  }
+  const isNum = v => typeof v === "number" && isFinite(v);
+
+  // 보기 좋은 눈금 간격 (1·2·5 × 10^k)
+  function niceTicks(min, max, count = 5) {
+    if (min === max) { min -= 1; max += 1; }
+    const raw = (max - min) / count;
+    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
+    const step = [1, 2, 5, 10].map(m => m * pow).find(s => s >= raw);
+    const lo = Math.floor(min / step) * step, hi = Math.ceil(max / step) * step;
+    const ticks = [];
+    for (let v = lo; v <= hi + step / 2; v += step) ticks.push(+v.toFixed(10));
+    return { lo, hi, ticks };
+  }
+
+  const svgOpen = (w, h, label) =>
+    `<svg class="chart" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(label)}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">`;
+
+  // ① 시장 대비 여유
+  //  data = { points: [{ label, ym, price }], plan, repay }  (모두 만원/평, 이미 계산된 값)
+  //  점: 인근 신규 공급 평당가 · 실선: 계획 평당가 · 점선: 상환 한계 평당가
+  function marketMargin(data) {
+    const pts = (data && data.points || []).filter(p => isNum(p.price));
+    if (!pts.length || !isNum(data.plan)) return null;
+    const W = 640, H = 300, L = 64, R = 120, T = 20, B = 40;
+    const values = pts.map(p => p.price).concat(data.plan, isNum(data.repay) ? data.repay : []);
+    const { lo, hi, ticks } = niceTicks(Math.min(...values), Math.max(...values));
+    const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+    const order = [...pts].sort((a, b) => String(a.ym).localeCompare(String(b.ym)));
+    const xs = order.map((_, i) => L + (order.length === 1 ? 0.5 : i / (order.length - 1)) * (W - L - R));
+    let s = svgOpen(W, H, "시장 대비 여유: 인근 신규 공급 평당가와 계획가 · 상환 한계");
+    // 눈금
+    for (const t of ticks) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text class="tick" x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${f(t)}</text>`;
+    // 상환 한계 ~ 계획가 사이 = 여유 구간
+    if (isNum(data.repay)) {
+      const a = y(Math.max(data.plan, data.repay)), b = y(Math.min(data.plan, data.repay));
+      s += `<rect class="${data.repay <= data.plan ? "band-ok" : "band-ng"}" x="${L}" y="${a}" width="${W - L - R}" height="${b - a}"/>`;
+      s += `<line class="line-repay" x1="${L}" x2="${W - R}" y1="${y(data.repay)}" y2="${y(data.repay)}"/>`;
+      s += `<text class="lbl-repay" x="${W - R + 6}" y="${y(data.repay) + 4}">상환 한계 ${f(data.repay)}</text>`;
+    }
+    s += `<line class="line-plan" x1="${L}" x2="${W - R}" y1="${y(data.plan)}" y2="${y(data.plan)}"/>`;
+    s += `<text class="lbl-plan" x="${W - R + 6}" y="${y(data.plan) + 4}">계획가 ${f(data.plan)}</text>`;
+    // 점
+    order.forEach((p, i) => {
+      s += `<circle class="pt" cx="${xs[i]}" cy="${y(p.price)}" r="5"><title>${esc(p.label || "")} ${esc(p.ym || "")} · ${f(p.price)}만원/평</title></circle>`;
+    });
+    // x축: 처음 · 끝 시기
+    s += `<line class="axis" x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}"/>`;
+    if (order.length) {
+      s += `<text class="tick" x="${xs[0]}" y="${H - B + 18}" text-anchor="middle">${esc(order[0].ym || "")}</text>`;
+      if (order.length > 1) s += `<text class="tick" x="${xs.at(-1)}" y="${H - B + 18}" text-anchor="middle">${esc(order.at(-1).ym || "")}</text>`;
+    }
+    s += `<text class="unit" x="${L - 8}" y="${T - 6}" text-anchor="end">만원/평</text>`;
+    return s + "</svg>";
+  }
+
+  // ② 사업수지 폭포
+  //  steps = Calc.waterfallSteps() 결과 [{ label, note, kind: total|down|up, value, from, to }] (억원)
+  function waterfall(steps) {
+    if (!steps || !steps.length || !steps.every(st => isNum(st.from) && isNum(st.to) && isNum(st.value))) return null;
+    const W = 640, H = 320, L = 64, R = 16, T = 28, B = 52;
+    const all = steps.flatMap(st => [st.from, st.to]).concat(0);
+    const { lo, hi, ticks } = niceTicks(Math.min(...all), Math.max(...all));
+    const y = v => T + (hi - v) / (hi - lo) * (H - T - B);
+    const band = (W - L - R) / steps.length, bw = band * 0.56;
+    let s = svgOpen(W, H, "사업수지 폭포: 분양수입에서 기말현금까지");
+    for (const t of ticks) s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}"/><text class="tick" x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${f(t)}</text>`;
+    s += `<line class="zero" x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}"/>`;
+    steps.forEach((st, i) => {
+      const x = L + i * band + (band - bw) / 2;
+      const top = y(Math.max(st.from, st.to)), bot = y(Math.min(st.from, st.to));
+      const cls = st.kind === "total" ? (st.to < 0 ? "bar-neg" : "bar-total") : st.kind === "down" ? "bar-down" : "bar-up";
+      s += `<rect class="${cls}" x="${x}" y="${top}" width="${bw}" height="${Math.max(bot - top, 1)}"><title>${esc(st.label)} ${f(st.value, 1)}억원</title></rect>`;
+      // 값 표시 (변동 단계는 부호 포함)
+      const txt = (st.kind === "up" ? "+" : "") + f(st.value, 1);
+      const above = st.value >= 0 || st.kind !== "total";
+      const ty = above ? top - 6 : bot + 14;
+      s += `<text class="val ${st.value < 0 ? "neg" : ""}" x="${x + bw / 2}" y="${ty}" text-anchor="middle">${txt}</text>`;
+      // 다음 막대로 잇는 선
+      if (i < steps.length - 1 && steps[i + 1].kind !== "total") {
+        s += `<line class="link" x1="${x + bw}" x2="${x + band}" y1="${y(st.to)}" y2="${y(st.to)}"/>`;
+      }
+      s += `<text class="cat" x="${x + bw / 2}" y="${H - B + 18}" text-anchor="middle">${esc(st.label)}</text>`;
+      if (st.note) s += `<text class="note" x="${x + bw / 2}" y="${H - B + 33}" text-anchor="middle">${esc(st.note)}</text>`;
+    });
+    s += `<text class="unit" x="${L - 8}" y="${T - 10}" text-anchor="end">억원</text>`;
+    return s + "</svg>";
+  }
+
+  const Charts = { niceTicks, marketMargin, waterfall };
+  if (typeof module !== "undefined" && module.exports) module.exports = Charts;
+  else root.Charts = Charts;
+})(this);
+
+</script>
+<script>/* app.js */
+// 화면 스크립트: 입력 폼 처리 + 사업계획서 7개 장 그리기
+// 계산은 calc.js, 장 구성(무엇을 보여줄지)은 report.js가 담당합니다.
+(function () {
+  "use strict";
+  const { PRESETS } = Presets;
+  const SALES_RATE = 1; // 화면은 분양률 100% 기준
+  const NUM_FIELDS = { price: 0, retail: 0, other: 0, fixed: 1, pf: 0, pfCost: 0, sub: 0 }; // 소수 자리수
+  const $ = id => document.getElementById(id);
+
+  // ── 공통 도우미 ─────────────────────────────
+  // 입력 문자열 → 숫자. 빈칸은 null (0으로 채우지 않음)
+  const parse = s => {
+    const t = String(s).replace(/,/g, "").trim();
+    if (t === "") return null;
+    const n = parseFloat(t);
+    return isFinite(n) ? n : null;
+  };
+  const fmt = (n, d = 0) => n.toLocaleString("ko-KR", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const fmtInput = (el, d) => { const n = parse(el.value); if (n !== null) el.value = fmt(n, d); };
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // 숫자 표시: 천단위 콤마, 음수는 "−" + 빨강
+  function N(n, d = 1, unit = "", sign = false) {
+    if (n === null || n === undefined || !isFinite(n)) return '<span class="na">–</span>';
+    const s = Report.f(n, d);
+    const txt = (sign && n > 0 && /[1-9]/.test(s) ? "+" : "") + s + unit;
+    return s.startsWith("−") ? `<span class="neg">${txt}</span>` : txt;
+  }
+  // 문장 속 음수("−123")를 빨강으로
+  const redNeg = html => html.replace(/−[\d,.]+[^\s·()]*/g, m => `<span class="neg">${m}</span>`);
+  const NA = '<span class="na">자료 없음</span>';
+  const empty = (lackList, msg = "자료 없음") =>
+    `<div class="empty"><b>${msg}</b>${lackList && lackList.length ? `<span>입력 필요: ${lackList.map(esc).join(" · ")}</span>` : ""}</div>`;
+  const chapter = (no, title, body) =>
+    `<section class="chapter" id="ch${no}"><h2><span class="no">${no}</span>${title}</h2>${body}</section>`;
+  // 지표 한 줄: 이름 · 값 · 옆에 쓴 수식
+  const metric = (label, value, formula, cls = "") =>
+    `<div class="metric ${cls}"><span class="m-label">${label}</span><span class="m-value">${value}</span><span class="m-formula">${formula || ""}</span></div>`;
+
+  // ── 입력 폼 ─────────────────────────────
+  const tbody = $("units");
+
+  function addRow(u = ["", "", "", ""]) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input data-k="name" placeholder="59형" aria-label="주택형 이름"></td>
+      <td><input class="num" data-k="excl" data-d="1" inputmode="decimal" aria-label="전용㎡"></td>
+      <td><input class="num" data-k="supply" data-d="1" inputmode="decimal" aria-label="공급평"></td>
+      <td><input class="num" data-k="hh" data-d="0" inputmode="numeric" aria-label="세대수"></td>
+      <td class="sub-total">–</td>
+      <td><button type="button" class="ghost" title="행 삭제">✕</button></td>`;
+    const ins = tr.querySelectorAll("input");
+    ins[0].value = u[0];
+    [1, 2, 3].forEach(i => { ins[i].value = u[i] === "" ? "" : fmt(+u[i], +ins[i].dataset.d); });
+    tr.querySelector("button").onclick = () => { tr.remove(); update(); };
+    tbody.appendChild(tr);
+  }
+
+  // 주택형 표 합계(공급면적 · 세대수) 갱신
+  function updateTotals() {
+    let hh = 0, area = 0;
+    tbody.querySelectorAll("tr").forEach(tr => {
+      const supply = parse(tr.querySelector('[data-k="supply"]').value) || 0;
+      const n = parse(tr.querySelector('[data-k="hh"]').value) || 0;
+      const a = supply * n;
+      tr.querySelector(".sub-total").textContent = a ? fmt(a, 1) : "–";
+      hh += n; area += a;
+    });
+    $("sumHH").textContent = fmt(hh) + " 세대";
+    $("sumArea").textContent = fmt(area, 1) + " 평";
+  }
+
+  // 폼 값을 읽어옵니다. 빈칸은 null로 남깁니다.
+  function readRaw() {
+    const units = [...tbody.querySelectorAll("tr")].map(tr => ({
+      name: tr.querySelector('[data-k="name"]').value.trim(),
+      excl: parse(tr.querySelector('[data-k="excl"]').value),
+      supply: parse(tr.querySelector('[data-k="supply"]').value),
+      households: parse(tr.querySelector('[data-k="hh"]').value),
+    }));
+    const raw = { name: $("name").value.trim(), site: $("site").value.trim(), units };
+    Object.keys(NUM_FIELDS).forEach(id => raw[id] = parse($(id).value));
+    return raw;
+  }
+
+  function fill(p) {
+    $("name").value = p ? p.name : "";
+    $("site").value = p ? p.site : "";
+    Object.entries(NUM_FIELDS).forEach(([id, d]) => $(id).value = p ? fmt(p[id], d) : "");
+    tbody.innerHTML = "";
+    if (p) p.units.forEach(u => addRow(u)); else addRow();
+    scheduleRegion(0);
+    update();
+  }
+
+  // ── 지역 확인 (서버 /api/region 호출 · 인증키는 서버에만 있음) ─────────────
+  let region = { status: "empty" };
+  let regionTimer = null, regionSeq = 0;
+
+  // 사업대상지가 바뀌면 잠시 기다렸다가 서버에 법정동코드를 묻습니다.
+  function scheduleRegion(delay = 500) {
+    clearTimeout(regionTimer);
+    const name = $("site").value.trim();
+    if (!name) { region = { status: "empty" }; stopMarket(); renderReport(); return; }
+    if (region.query === name && region.status !== "pending") return; // 이미 확인한 이름
+    region = { status: "pending", query: name };
+    regionTimer = setTimeout(() => checkRegion(name), delay);
+  }
+
+  async function checkRegion(name) {
+    const seq = ++regionSeq;
+    let result;
+    if (location.protocol === "file:") {
+      result = { status: "offline", query: name };
+    } else {
+      try {
+        const res = await fetch(`/api/region?name=${encodeURIComponent(name)}`);
+        result = res.ok ? await res.json() : { status: "offline", query: name };
+      } catch { result = { status: "offline", query: name }; }
+    }
+    if (seq !== regionSeq) return; // 그 사이 이름이 또 바뀐 경우 무시
+    region = { ...result, query: name };
+    if (region.status === "ok") startMarket(region.name); else stopMarket();
+    renderReport();
+  }
+
+  // ── 실거래 최근 12개월 (서버 /api/trades · 지역 이름만 보냄, 코드는 서버가 다시 확인) ──
+  let market = null, marketCtl = null, renderQueued = false;
+
+  // 여러 달이 연달아 도착해도 화면은 잠깐 모아서 한 번만 다시 그림
+  // (requestAnimationFrame은 탭이 안 보이면 멈추므로 타이머 사용)
+  function queueRender() {
+    if (renderQueued) return;
+    renderQueued = true;
+    setTimeout(() => { renderQueued = false; renderReport(); }, 60);
+  }
+
+  function stopMarket() {
+    if (marketCtl) marketCtl.abort();
+    marketCtl = null; market = null;
+  }
+
+  async function startMarket(name) {
+    if (market && market.name === name) return; // 같은 지역은 다시 시작하지 않음
+    stopMarket();
+    const ctl = marketCtl = new AbortController();
+    market = { name, code: null, months: [], silv: {}, rent: {}, done: false, failure: null, supply: { status: "loading" } };
+    const m = market;
+    loadSupply(m);
+    try {
+      const res = await fetch(`/api/trades?name=${encodeURIComponent(name)}`, { signal: ctl.signal });
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let nl;
+        while ((nl = buf.indexOf("\n")) >= 0) {
+          const line = buf.slice(0, nl).trim(); buf = buf.slice(nl + 1);
+          if (line) onMarketEvent(m, JSON.parse(line));
+        }
+      }
+    } catch (e) {
+      if (ctl.signal.aborted) return;
+      m.failure = "실거래 조회 연결이 끊겼습니다";
+    }
+    // 스트림이 끝났는데 결과가 안 온 달은 실패로 표시해 [다시 시도] 할 수 있게
+    for (const kind of ["silv", "rent"]) for (const ym of m.months) {
+      if (!m[kind][ym] || m[kind][ym].status === "loading") m[kind][ym] = { status: "error", message: "응답 없음" };
+    }
+    m.done = true;
+    if (market === m) queueRender();
+  }
+
+  // 인근 신규 공급 평당가 (서버 /api/supply · 이름만 보냄)
+  async function loadSupply(m) {
+    m.supply = { status: "loading" };
+    let r;
+    try { r = await (await fetch(`/api/supply?name=${encodeURIComponent(m.name)}`)).json(); }
+    catch { r = { status: "error", message: "서버에 연결하지 못했습니다" }; }
+    if (market !== m) return;
+    m.supply = r;
+    queueRender();
+  }
+
+  function onMarketEvent(m, ev) {
+    if (ev.type === "region" && ev.status !== "ok") m.failure = `서버 지역 확인 실패 — ${Report.REGION_REASON[ev.status] || ev.status}${ev.message ? ` (${ev.message})` : ""}`;
+    if (ev.type === "start") { m.code = ev.code; m.name = ev.name; m.months = ev.months; }
+    if (ev.type === "month") m[ev.kind][ev.ym] = ev;
+    if (ev.type === "done") m.done = true;
+    if (market === m) queueRender();
+  }
+
+  // 실패한 달 [다시 시도]
+  async function retryMonth(kind, ym) {
+    const m = market;
+    if (!m) return;
+    m[kind][ym] = { status: "loading" };
+    renderReport();
+    let r;
+    try {
+      const res = await fetch(`/api/trades/month?name=${encodeURIComponent(m.name)}&kind=${kind}&ym=${ym}`);
+      r = await res.json();
+    } catch { r = { status: "error", message: "서버에 연결하지 못했습니다" }; }
+    if (market !== m) return;
+    m[kind][ym] = r;
+    renderReport();
+  }
+
+  // 1장의 "법정동코드" 줄
+  function regionMetric(r) {
+    const label = "법정동코드 <small>시군구</small>";
+    if (r.status === "ok") {
+      return metric(label, `<b>${esc(r.code)}</b>`, `<span class="badge ok">확인됨</span> ${esc(r.name)} · 공공데이터 법정동코드 조회`);
+    }
+    if (r.status === "ambiguous" && r.candidates && r.candidates.length) {
+      const list = r.candidates.map(c =>
+        `<button type="button" class="cand" data-name="${esc(c.name)}">${esc(c.name)} <small>${esc(c.code)}</small></button>`).join("");
+      return metric(label, NA, `<span class="badge ng">후보 ${r.candidates.length}개</span> 정확히 하나로 맞지 않습니다 — 선택하면 사업대상지가 바뀝니다<div class="cands no-print">${list}</div>`);
+    }
+    const reason = Report.REGION_REASON[r.status] || r.status;
+    const extra = r.status === "error" && r.message ? ` (${esc(r.message)})` : "";
+    const badge = r.status === "pending" ? "" : '<span class="badge ng">미확인</span> ';
+    return metric(label, NA, `${badge}${esc(reason)}${extra}`);
+  }
+
+  // ── 사업계획서 7개 장 ─────────────────────────────
+  function ch1(R) {
+    const o = R.overview;
+    if (o.empty) return chapter(1, "사업 개요", empty(R.missing.filter(m => ["사업명", "사업대상지", "주택형(공급평·세대수)"].includes(m))));
+    const v = x => (x === null ? NA : x);
+    const unitsTable = o.units.length
+      ? `<div class="table-wrap"><table class="grid-table">
+          <thead><tr><th>주택형</th><th class="r">전용㎡</th><th class="r">공급평</th><th class="r">세대수</th><th class="r">공급면적(평)</th></tr></thead>
+          <tbody>${o.units.map(u => `<tr><td>${u.name ? esc(u.name) : NA}</td><td class="r">${N(u.excl, 1)}</td><td class="r">${N(u.supply, 1)}</td><td class="r">${N(u.households, 0)}</td><td class="r">${u.supply !== null && u.households !== null ? N(u.supply * u.households, 1) : "–"}</td></tr>`).join("")}</tbody>
+          <tfoot><tr><td>합계</td><td></td><td></td><td class="r">${o.households !== null ? N(o.households, 0) : "–"}</td><td class="r">${o.supplyArea !== null ? N(o.supplyArea, 1) : "–"}</td></tr></tfoot>
+        </table></div>`
+      : empty(["주택형(공급평·세대수)"]);
+    return chapter(1, "사업 개요", `
+      <div class="metrics">
+        ${metric("사업명", v(o.name ? esc(o.name) : null), "", "text")}
+        ${metric("사업대상지", v(o.site ? esc(o.site) : null), "", "text")}
+        ${regionMetric(o.region)}
+        ${metric("세대수", o.households !== null ? N(o.households, 0, "세대") : NA, "Σ 주택형별 세대수")}
+        ${metric("공급면적", o.supplyArea !== null ? N(o.supplyArea, 1, "평") : NA, "Σ 공급평 × 세대수")}
+        ${metric("평당가", o.price !== null ? N(o.price, 0, "만원") : NA)}
+        ${metric("상가", o.retail !== null ? N(o.retail, 1, "억원") : NA)}
+      </div>
+      <h3>주택형</h3>${unitsTable}`);
+  }
+
+  function ch2(R) {
+    const M = R.market;
+    if (!M.ok) {
+      const why = market && market.failure ? market.failure
+        : region.status === "ok" ? "" : `지역 미확인 — ${Report.REGION_REASON[region.status] || region.status}`;
+      return chapter(2, "시장 분석", empty(why ? [why] : null, esc(M.message)).replace("입력 필요: ", "") + marketChartBlock(R));
+    }
+    const t1 = M.table1, t2 = M.table2, P = t1.progress;
+    const dates = !M.dates.length ? "–" : M.dates.length === 1 ? M.dates[0] : `${M.dates[0]} ~ ${M.dates[M.dates.length - 1]}`;
+    const area = `${esc(M.name)} (법정동코드 ${esc(M.code)})`;
+    const meta = rows => `<dl class="meta">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`;
+    const progress = `<p class="progress ${P.silv + P.rent < P.total * 2 ? "busy" : ""}">분양권 ${P.silv}/${P.total} · 전월세 ${P.rent}/${P.total}${t1.errors.length ? ` · <span class="neg">실패 ${t1.errors.length}</span>` : ""}</p>`;
+
+    // ① 월별 거래 건수
+    const cnt = (kind, c, ym) => {
+      if (c.status === "ok") return N(c.summary.count, 0);
+      if (c.status === "error") return `<span class="neg" title="${esc(c.message || "")}">오류</span> <button type="button" class="retry no-print" data-kind="${kind}" data-ym="${ym}">다시 시도</button><div class="errmsg">${esc(c.message || "")}</div>`;
+      return '<span class="na">조회 중…</span>';
+    };
+    const sub = (c, f) => (c.status === "ok" ? `<small>${f(c.summary)}</small>` : "");
+    const table1 = `
+      <div class="table-wrap"><table class="grid-table">
+        <thead><tr><th>계약월</th><th class="r">분양권 전매</th><th class="r">전월세</th><th class="r">전세 · 월세</th></tr></thead>
+        <tbody>${t1.rows.map(r => `<tr>
+          <td>${r.label}</td>
+          <td class="r">${cnt("silv", r.silv, r.ym)}</td>
+          <td class="r">${cnt("rent", r.rent, r.ym)}</td>
+          <td class="r">${sub(r.rent, s => `${fmt(s.jeonse)} · ${fmt(s.wolse)}`)}</td></tr>`).join("")}</tbody>
+        <tfoot><tr><td>합계</td><td class="r">${N(t1.totals.silv, 0)}</td><td class="r">${N(t1.totals.rent, 0)}</td><td class="r"><small>${fmt(t1.totals.jeonse)} · ${fmt(t1.totals.wolse)}</small></td></tr></tfoot>
+      </table></div>
+      ${meta([
+        ["지역", area],
+        ["건수", `분양권 ${fmt(t1.totals.silv)}건 (${t1.okMonths.silv}/${P.total}개월) · 전월세 ${fmt(t1.totals.rent)}건 (${t1.okMonths.rent}/${P.total}개월)`],
+        ["제외 기준", `분양권: 해제여부(cdealType) 표시 거래 ${fmt(t1.totals.silvCancelled)}건 제외 · 전월세: 기술문서에 해제 항목 없음${t1.totals.rentCancelled ? ` (해제 표시 ${fmt(t1.totals.rentCancelled)}건 제외)` : ""}`],
+        ["조회일", dates],
+      ])}`;
+
+    // ② 잔금 여력
+    const band = `전용 ${Market.BAND84.min}㎡ 이상 ${Market.BAND84.max}㎡ 미만`;
+    let body2;
+    if (!t2.ours.length) {
+      body2 = empty([`우리 사업에 84㎡(${band}) 주택형 · 평당가 입력`]);
+    } else if (t2.avg === null) {
+      body2 = empty(null, t2.monthsUsed ? "84㎡ 신규 전세 거래 없음" : "자료 없음 — 전월세 조회 중");
+    } else {
+      body2 = `<div class="metrics">
+        ${metric("84㎡ 신규 전세 평균", N(t2.avg, 0, "만원"), `= 보증금 합계 ÷ ${fmt(t2.n)}건`)}
+        ${t2.ours.map(o => `
+          ${metric(`우리 ${esc(o.name || "84㎡")} 세대당 분양가`, N(o.unitPrice, 0, "만원"), `= 공급 ${N(o.supply, 1)}평 × 평당가 ${N(R.overview.price, 0)}만원`)}
+          ${metric("잔금 여력", N(o.ratio * 100, 1, "%"), `= 84㎡ 신규 전세 평균 ${N(t2.avg, 0)} ÷ 세대당 분양가 ${N(o.unitPrice, 0)}`, "key")}`).join("")}
+      </div>`;
+    }
+    const x = t2.excluded;
+    const table2 = `${body2}
+      ${meta([
+        ["지역", area],
+        ["건수", `기준 충족 ${fmt(t2.n)}건 / 84㎡ 전월세 ${fmt(t2.n84)}건 / 전월세 전체 ${fmt(t2.rentCount)}건 (${t2.monthsUsed}/${P.total}개월)`],
+        ["제외 기준", `84㎡ = ${band} · 월세(월세금액 > 0) ${fmt(x.wolse)}건 · 갱신 계약 ${fmt(x.renew)}건 · 계약구분 미기재 ${fmt(x.unknown)}건 · 84㎡ 외 면적 ${fmt(x.non84)}건 제외`],
+        ["조회일", dates],
+      ])}`;
+
+    return chapter(2, "시장 분석", `
+      ${progress}
+      <h3>① 월별 거래 건수 <small>최근 12개월 · 계약월 기준</small></h3>${table1}
+      <h3>② 잔금 여력 <small>84㎡ 신규 전세 평균 ÷ 우리 84㎡ 세대당 분양가</small></h3>${table2}
+      ${marketChartBlock(R)}`);
+  }
+
+  // ── 차트 (charts.js가 SVG를 그림 · 숫자는 report/calc에서 이미 계산된 값) ──
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+  const caption = rows => `<dl class="meta chart-meta">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}</dl>`;
+
+  // 차트 ① 시장 대비 여유 (2장)
+  function marketChartBlock(R) {
+    const c = R.marketChart;
+    const svg = Charts.marketMargin(c);
+    const lack = [];
+    if (!c.points.length) {
+      lack.push(c.status === "loading" ? "인근 신규 공급 평당가 — 조회 중…"
+        : c.status === "error" ? `인근 신규 공급 평당가 — 조회 실패: ${c.message || ""}`
+        : c.status === "ok" ? "인근 신규 공급 평당가 — 최근 24개월 84㎡ 공급 단지 없음"
+        : "인근 신규 공급 평당가 — 지역 확인 후 조회");
+    }
+    if (c.plan === null) lack.push("계획 평당가");
+    if (c.repay === null) lack.push("상환 한계 평당가 (5장 계산에 필요한 입력)");
+    const x = c.excluded;
+    const exText = x ? [x.no84 && `84㎡ 주택형 없음 ${fmt(x.no84)}`, x.rent && `임대 ${fmt(x.rent)}`, x.error && `주택형 조회 실패 ${fmt(x.error)}`].filter(Boolean).join(" · ") : "";
+    const count = c.status === "ok"
+      ? `${fmt(c.points.length)}개 단지 (APT 공고 ${fmt(c.notices)}건${exText ? ` 중 제외: ${exText}` : ""})${c.window ? ` · 모집공고일 ${esc(c.window.from)} ~ ${esc(c.window.to)}` : ""}`
+      : "–";
+    return `<h3>차트 · 시장 대비 여유 <small>인근 신규 공급 평당가 · 계획가 · 상환 한계</small></h3>
+      ${svg ? `<figure class="chart-box">${svg}</figure>` : empty(lack).replace("입력 필요: ", "없는 자료: ")}
+      ${c.points.length ? `<div class="table-wrap"><table class="grid-table pts">
+        <thead><tr><th>단지</th><th>모집공고일</th><th class="r">84㎡ 타입</th><th class="r">평당가(만원)</th></tr></thead>
+        <tbody>${c.points.map(p => `<tr><td>${esc(p.label)}</td><td>${esc(p.date)}</td><td class="r">${fmt(p.types)}</td><td class="r">${N(p.price, 0)}</td></tr>`).join("")}</tbody>
+      </table></div>` : ""}
+      ${caption([
+        ["단위", "만원/평 · 공급면적 기준 · 점 = 단지별 84㎡ 주택형 분양최고금액 ÷ 공급평 (평균)"],
+        ["건수", count],
+        ["조회일", c.fetchedAt ? esc(String(c.fetchedAt).slice(0, 10)) : "–"],
+        ["출처", `점: ${c.source ? esc(c.source) : "청약홈 분양정보 (조회 전)"} · 계획가: 입력값${c.plan !== null ? ` ${fmt(c.plan)}` : ""} · 상환 한계: 5장 계산${c.repay !== null ? ` ${fmt(Math.round(c.repay))}` : ""}`],
+      ])}`;
+  }
+
+  // 차트 ② 사업수지 폭포 (3장)
+  function waterfallBlock(R) {
+    const F = R.feasibility;
+    const svg = F.ok ? Charts.waterfall(F.waterfall) : null;
+    return `<h3>차트 · 사업수지 폭포 <small>분양수입 → 변동비 → 고정비 → 기타유입 → 기말현금</small></h3>
+      ${svg ? `<figure class="chart-box">${svg}</figure>` : empty(F.lack)}
+      ${caption([
+        ["단위", "억원"],
+        ["건수", F.ok ? `${F.waterfall.length}단계 · ${fmt(F.result.households)}세대 · 분양률 ${Report.pct(R.rate, 0)}` : "–"],
+        ["조회일", `${today()} (입력값으로 계산한 날)`],
+        ["출처", "입력값 + 3장 사업수지 계산 · 변동비 = 학교용지 0.8% + 분양대행 세대당 300만원"],
+      ])}`;
+  }
+
+  function ch3(R) {
+    const F = R.feasibility;
+    if (!F.ok) return chapter(3, "사업수지", empty(F.lack));
+    const r = F.result, i = F.input, rate = Report.pct(R.rate, 0);
+    return chapter(3, "사업수지", `
+      <p class="basis">분양률 ${rate} 기준 · 단위 억원</p>
+      <div class="metrics">
+        ${metric("분양수입", N(r.revenue, 1), `= (공급면적 ${N(r.supplyArea, 1)}평 × 평당가 ${N(i.price, 0)}만원 ÷ 10,000 + 상가 ${N(i.retail, 1)}) × 분양률 ${rate}`)}
+        ${metric("(−) 학교용지", N(r.schoolLevy, 1), `= 분양수입 × 0.8%`)}
+        ${metric("(−) 분양대행", N(r.agencyFee, 1), `= 팔린 세대 ${N(r.soldHouseholds, 0)}세대 × 300만원`)}
+        ${metric("(+) 기타유입", N(i.other, 1), "입력값")}
+        ${metric("(−) 고정비", N(i.fixed, 1), "입력값")}
+        ${metric("기말현금", N(r.endingCash, 1, "", true), "= 분양수입 × (1 − 0.8%) − 분양대행 + 기타유입 − 고정비", "total")}
+      </div>
+      ${waterfallBlock(R)}`);
+  }
+
+  function ch4(R) {
+    const P = R.funding;
+    if (!P.ok) return chapter(4, "자금조달과 상환", empty(P.lack));
+    const r = P.result, i = P.input;
+    return chapter(4, "자금조달과 상환", `
+      <p class="basis">분양률 ${Report.pct(R.rate, 0)} 기준 · 단위 억원</p>
+      <div class="metrics">
+        ${metric("본PF", N(i.pf, 1), "입력값")}
+        ${metric("본PF 금융비용", N(i.pfCost, 1), "입력값")}
+        ${metric("후순위", N(i.sub, 1), "입력값")}
+        ${metric("PF 상환 대상", N(P.debt, 1), `= 본PF ${N(i.pf, 1)} + 금융비용 ${N(i.pfCost, 1)}`)}
+        ${metric("만기 누적 DSCR", N(r.dscr, 2, "배"), `= 1 + (기말현금 ${N(r.endingCash, 1)} + 후순위 ${N(i.sub, 1)}) ÷ (본PF ${N(i.pf, 1)} + 금융비용 ${N(i.pfCost, 1)})`, "key")}
+        ${metric("LTV", N(r.ltv * 100, 1, "%"), `= 본PF ${N(i.pf, 1)} ÷ 분양률 100% 분양수입 ${N(Calc.salesRevenue(i, 1), 1)}`, "key")}
+        ${metric("상환 여유", N(P.margin, 1, "", true), `= 기말현금 ${N(r.endingCash, 1)} + 후순위 ${N(i.sub, 1)}`)}
+        ${metric("PF 전액 상환", P.canRepay ? '<span class="badge ok">가능</span>' : '<span class="badge ng">불가</span>', `기말현금 ${N(r.endingCash, 1)} ${P.canRepay ? "≥" : "<"} −후순위 ${N(-i.sub, 1)}`, "total")}
+      </div>`);
+  }
+
+  function ch5(R) {
+    const S = R.sensitivity;
+    if (!S.ok) return chapter(5, "민감도", empty(S.lack));
+    const L = S.limits, plan = S.input.price;
+    const pctN = r => (isFinite(r) ? N(r * 100, 1, "%") : "–");
+    const won = p => (isFinite(p) ? N(p, 0, "만원") : "–");
+    const head = S.table.columns.map(c =>
+      `<th class="${c.delta === 0 ? "plan" : ""}">${fmt(c.price)}<br><small>${c.delta === 0 ? "계획" : (c.delta > 0 ? "+" : "−") + fmt(Math.abs(c.delta))}</small></th>`).join("");
+    const body = S.table.rows.map(row =>
+      `<tr><th class="row">${Report.pct(row.rate, 0)}</th>` + row.cells.map((cell, k) => {
+        const cls = [cell.canRepay ? "ok" : "ng", row.rate === 1 && S.table.columns[k].delta === 0 ? "plan" : ""].join(" ");
+        return `<td class="${cls}" title="${cell.canRepay ? "상환 가능" : "상환 불가"}">${N(cell.endingCash, 1, "", true)}</td>`;
+      }).join("") + "</tr>").join("");
+    return chapter(5, "민감도", `
+      <h3>두 한계선</h3>
+      <div class="table-wrap"><table class="grid-table">
+        <thead><tr><th></th><th class="r">분양률<br><small>계획 평당가 ${fmt(plan)}만원</small></th><th class="r">평당가<br><small>분양률 100%</small></th></tr></thead>
+        <tbody>
+          <tr><td>기말현금 0</td><td class="r b">${pctN(L.zero.rate)}</td><td class="r b">${won(L.zero.price)}</td></tr>
+          <tr><td>상환 한계 <small>기말현금 = −후순위</small></td><td class="r b">${pctN(L.repay.rate)}</td><td class="r b">${won(L.repay.price)}</td></tr>
+        </tbody>
+      </table></div>
+      <h3>기말현금 민감도 <small>단위 억원 · 초록 = 상환 가능(기말현금 ≥ −후순위) · 빨강 = 불가</small></h3>
+      <div class="table-wrap"><table class="sens">
+        <thead><tr><th class="row">분양률↓ 평당가→</th>${head}</tr></thead>
+        <tbody>${body}</tbody>
+      </table></div>
+      <p class="verdict">${S.sentence ? esc(S.sentence) : "상환 한계를 구할 수 없습니다"}</p>
+      <p class="note">평당가 한계는 분양률 100% 기준, 분양률 한계는 계획 평당가 기준 · 문장의 한계값은 "이상이면"이 성립하도록 올림</p>`);
+  }
+
+  function ch6(R) {
+    const K = R.risks;
+    if (!K.ok) return chapter(6, "리스크와 완화 방안", empty(K.lack));
+    return chapter(6, "리스크와 완화 방안", `
+      <p class="basis">5장의 두 한계선(기말현금 0 · 상환 한계)에서 거꾸로 짚은 항목입니다.</p>
+      ${K.items.map((k, n) => `
+        <div class="risk ${k.ok ? "ok" : "ng"}">
+          <h3>${n + 1}. ${esc(k.title)} <span class="badge ${k.ok ? "ok" : "ng"}">${k.ok ? "계획 기준 여유 있음" : "계획 기준 미달"}</span></h3>
+          <p>${redNeg(esc(k.finding))}</p>
+          <ul>${k.mitigation.map(m => `<li>${redNeg(esc(m))}</li>`).join("")}</ul>
+        </div>`).join("")}`);
+  }
+
+  function ch7(R) {
+    return chapter(7, "확인하지 못한 것", `<ul class="unverified">${R.unverified.map(t => `<li>${esc(t)}</li>`).join("")}</ul>`);
+  }
+
+  function renderReport() {
+    const raw = readRaw();
+    const R = Report.buildReport(raw, SALES_RATE, region, market);
+    $("docTitle").textContent = R.overview.name ? `사업계획서 — ${R.overview.name}` : "사업계획서";
+    $("docSub").textContent = [R.overview.site, `작성 ${new Date().toLocaleDateString("ko-KR")}`].filter(Boolean).join(" · ");
+    $("report").innerHTML = [ch1, ch2, ch3, ch4, ch5, ch6, ch7].map(fn => fn(R)).join("");
+  }
+
+  function update() { updateTotals(); renderReport(); }
+
+  // ── 이벤트 연결 ─────────────────────────────
+  $("form").addEventListener("input", update);
+  tbody.addEventListener("focusout", e => { if (e.target.dataset.d) fmtInput(e.target, +e.target.dataset.d); });
+  Object.entries(NUM_FIELDS).forEach(([id, d]) => $(id).addEventListener("blur", e => fmtInput(e.target, d)));
+  document.querySelectorAll("[data-preset]").forEach(b => b.onclick = () => fill(PRESETS[b.dataset.preset]));
+  $("clear").onclick = () => fill(null);
+  $("addRow").onclick = () => { addRow(); update(); };
+  $("print").onclick = () => window.print();
+  $("site").addEventListener("input", () => scheduleRegion());
+  // 후보 버튼: 누르면 사업대상지를 그 이름으로 바꾸고 다시 확인
+  $("report").addEventListener("click", e => {
+    const rt = e.target.closest(".retry");
+    if (rt) return retryMonth(rt.dataset.kind, rt.dataset.ym);
+    const b = e.target.closest(".cand");
+    if (!b) return;
+    $("site").value = b.dataset.name;
+    scheduleRegion(0);
+    update();
+  });
+
+  fill(null);
+})();
+
+</script>
+</body>
+</html>
